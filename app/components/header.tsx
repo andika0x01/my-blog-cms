@@ -23,9 +23,11 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
   ];
 
   return (
-    <header className="py-6 flex items-center justify-between sticky top-0 z-50 bg-oled/80 backdrop-blur-md gap-2">
-      <Link to="/" className="text-white font-medium tracking-tight text-base md:text-xl shrink-0">
-        Andika Dinata<span className="text-gray-500">.</span>
+    <header className="py-6 flex items-center justify-between sticky top-0 z-50 bg-oled/80 backdrop-blur-md gap-1">
+      <Link to="/" className="text-white font-medium tracking-tight text-sm md:text-xl shrink-0">
+        <span className="hidden sm:inline">Andika Dinata</span>
+        <span className="sm :hidden">AD</span>
+        <span className="text-gray-500">.</span>
       </Link>
 
       <div className="flex items-center gap-1 md:gap-3">
@@ -39,7 +41,7 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "relative px-2.5 md:px-4 py-2 text-xs md:text-sm transition-colors rounded-full flex items-center gap-2 z-10 font-medium",
+                  "relative px-2 md:px-4 py-2 text-xs md:text-sm transition-colors rounded-full flex items-center gap-2 z-10 font-medium",
                   isActive ? "text-oled" : "text-gray-400 hover:text-white"
                 )}
               >
