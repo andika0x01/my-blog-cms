@@ -62,6 +62,7 @@ export default function Blog({ loaderData }: Route.ComponentProps) {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
+                  timeZone: "Asia/Jakarta",
                 })}
               </time>
 

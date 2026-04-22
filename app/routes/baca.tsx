@@ -1,4 +1,5 @@
 import { data, Form, Link, redirect, useNavigation } from "react-router";
+import { useRef, useEffect } from "react";
 import { Trash, PencilSimple, Heart, ChatCircle, ArrowLeft, PaperPlaneTilt, ArrowUDownLeft, X } from "@phosphor-icons/react";
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -168,7 +169,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
               )}
             </div>
             <time className="text-sm text-zinc-500 font-mono italic">
-              {new Date(post.created_at).toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+              {new Date(post.created_at).toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Jakarta" })}
             </time>
           </div>
 
@@ -288,7 +289,12 @@ function CommentItem({ comment, onReply, isAuthor, isReply, isReplying }: any) {
             {isAuthor && <span className="text-[8px] bg-zinc-200 text-zinc-950 px-1.5 py-0.5 rounded-sm font-black uppercase tracking-tighter">Author</span>}
           </div>
           <span className="text-[10px] font-mono text-zinc-600 tracking-wider uppercase">
-            {new Date(comment.created_at).toLocaleDateString()} — {new Date(comment.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            {new Date(comment.created_at).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta" })} —{" "}
+            {new Date(comment.created_at).toLocaleTimeString("id-ID", {
+              hour: "2-digit",
+              minute: "2-digit",
+              timeZone: "Asia/Jakarta",
+            })}
           </span>
         </div>
 
@@ -309,11 +315,20 @@ function CommentItem({ comment, onReply, isAuthor, isReply, isReplying }: any) {
 
 function CommentForm({ post_id, parent_id, visitorName, isLoggedIn, onCancel, autoFocus, title }: any) {
   const navigation = useNavigation();
+  const formRef = useRef<HTMLFormElement>(null);
+
   const isSubmitting = navigation.state === "submitting";
   const showNameInput = !isLoggedIn && !visitorName;
 
+  useEffect(() => {
+    if (navigation.state === "idle") {
+      formRef.current?.reset();
+    }
+  }, [navigation.state]);
+
   return (
     <Form
+      ref={formRef}
       method="post"
       className={cn("flex flex-col gap-4 p-5 rounded-2xl border transition-all", parent_id ? "bg-zinc-900/40 border-white/10 mt-2 shadow-lg" : "bg-white/[0.02] border-white/5")}
     >

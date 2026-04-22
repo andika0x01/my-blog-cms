@@ -88,7 +88,7 @@ export default function Notifikasi({ loaderData }: Route.ComponentProps) {
                   <span className={cn("text-sm font-semibold tracking-tight", c.is_read === 0 ? "text-white" : "text-gray-400")}>{c.name}</span>
                   <span className="text-[10px] text-gray-600 font-mono">— {c.post_title}</span>
                 </div>
-                <span className="text-[10px] font-mono text-gray-600 uppercase">{new Date(c.created_at).toLocaleDateString()}</span>
+                <span className="text-[10px] font-mono text-gray-600 uppercase">{new Date(c.created_at).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta" })}</span>
               </div>
 
               <p className={cn("text-sm leading-relaxed max-w-[60ch]", c.is_read === 0 ? "text-gray-300" : "text-gray-500")}>{c.content}</p>

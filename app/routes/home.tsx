@@ -51,6 +51,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
+                  timeZone: "Asia/Jakarta",
                 })}
               </time>
               <div className="absolute bottom-0 left-0 h-[1px] w-full bg-white/5">
