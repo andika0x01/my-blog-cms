@@ -1,0 +1,63 @@
+@import "tailwindcss" source(".");
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Definisi warna kustom */
+  --color-oled: #050505;
+  --color-accent: #ffffff;
+
+  /* Reset font ke font default Tailwind sans-serif */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html,
+  body {
+    @apply bg-oled text-gray-400 antialiased min-h-[100dvh] overflow-x-hidden;
+    /* Memaksa dark mode secara default karena ini tema dominan gelap */
+    color-scheme: dark;
+  }
+
+  /* Styling seleksi teks dengan warna accent putih */
+  ::selection {
+    @apply bg-accent text-oled;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-white font-medium tracking-tight;
+  }
+}
+
+/* Tiptap Placeholder Styling */
+.tiptap p.is-editor-empty:first-child::before {
+  color: #52525b; /* zinc-600 */
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.prose pre {
+  background-color: #000000 !important; /* OLED black background */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+}
+
+.prose code {
+  color: #e5e7eb;
+  background-color: transparent;
+  padding: 0;
+  font-weight: 400;
+}
+
+/* Hilangkan backtick otomatis dari Tailwind prose pada inline code */
+.prose code::before,
+.prose code::after {
+  content: "" !important;
+}
