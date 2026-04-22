@@ -9,7 +9,7 @@ import { siteConfig } from "./config";
 export function meta() {
   return [
     { charSet: "utf-8" },
-    { name: "viewport", content: "width=device-width, initial-scale=1" },
+    { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=5" },
     { name: "theme-color", content: "#050505" },
     { name: "author", content: siteConfig.author },
     { property: "og:site_name", content: siteConfig.name },
@@ -40,7 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-oled text-gray-400 antialiased selection:bg-white selection:text-black">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -51,15 +51,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App({ loaderData }: Route.ComponentProps) {
   return (
-    <div className="max-w-[720px] mx-auto w-full px-5 md:px-0 min-h-[100dvh] flex flex-col">
-      <Header isLoggedIn={loaderData.isLoggedIn} />
-      <main className="flex-1 py-12 md:py-16">
-        <Outlet />
-      </main>
-      <footer className="py-8 border-t border-white/10 text-sm text-gray-600 flex justify-between items-center">
-        <p>© {new Date().getFullYear()} Andika Dinata.</p>
-      </footer>
-    </div>
+    <Layout>
+      <div className="max-w-[720px] mx-auto w-full px-5 md:px-0 min-h-[100dvh] flex flex-col break-words overflow-x-hidden">
+        <Header isLoggedIn={loaderData.isLoggedIn} />
+        <main className="flex-1 py-12 md:py-16">
+          <Outlet />
+        </main>
+        <footer className="py-8 border-t border-white/10 text-sm text-gray-600 flex justify-between items-center">
+          <p>
+            © {new Date().getFullYear()} {siteConfig.name}.
+          </p>
+        </footer>
+      </div>
+    </Layout>
   );
 }
 
@@ -76,9 +80,9 @@ export function ErrorBoundary({ error }: any) {
 
   return (
     <Layout>
-      <div className="max-w-[720px] mx-auto w-full px-5 md:px-0">
+      <div className="max-w-[720px] mx-auto w-full px-5 md:px-0 min-h-[100dvh] flex flex-col break-words">
         <Header isLoggedIn={false} />
-        <main className="py-12 md:py-16">
+        <main className="flex-1 py-12 md:py-16">
           <ErrorPage status={status} message={message} />
         </main>
       </div>

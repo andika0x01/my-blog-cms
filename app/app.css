@@ -43,10 +43,12 @@
 }
 
 .prose pre {
-  background-color: #000000 !important; /* OLED black background */
+  background-color: #000000 !important;
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1.25rem;
   border-radius: 0.75rem;
+  overflow-x: auto;
+  white-space: pre;
 }
 
 .prose code {

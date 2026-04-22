@@ -44,8 +44,6 @@ export function Editor({ onChange, initialContent = "" }: { onChange?: (html: st
         },
       }),
       Youtube.configure({
-        width: 720,
-        height: 405,
         HTMLAttributes: { class: "rounded-2xl overflow-hidden my-8 w-full aspect-video" },
       }),
     ],

@@ -219,7 +219,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
               )}
             >
               <Heart weight={isActuallyLiked ? "fill" : "bold"} className={cn("w-3.5 h-3.5", isActuallyLiked ? "text-red-500" : "")} />
-              {isActuallyLiked ? "Liked" : "Like"} <span className="opacity-40">{likes}</span>
+              {isActuallyLiked ? "Liked" : "Like"} <span className="opacity-60">{likes}</span>
             </button>
           </Form>
         </div>
