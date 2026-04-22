@@ -3,6 +3,11 @@ import type { Route } from "./+types/notifikasi";
 import { Link, Form, useNavigation } from "react-router";
 import { cn } from "~/utils/cn";
 import { BellSlash, CaretRight } from "@phosphor-icons/react";
+import { siteConfig } from "~/config";
+
+export function meta() {
+  return [{ title: `Notifikasi | ${siteConfig.name}` }];
+}
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   const userId = await requireUser(request, context.cloudflare.env);

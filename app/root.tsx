@@ -4,12 +4,18 @@ import { getAuthSession } from "./utils/session.server";
 import { Header } from "./components/header";
 import "./app.css";
 import { ErrorPage } from "./components/error-page";
+import { siteConfig } from "./config";
 
 export function meta() {
   return [
+    { charSet: "utf-8" },
     { name: "viewport", content: "width=device-width, initial-scale=1" },
     { name: "theme-color", content: "#050505" },
-    { property: "og:site_name", content: "Andika Dinata" },
+    { name: "author", content: siteConfig.author },
+    { property: "og:site_name", content: siteConfig.name },
+    { property: "og:locale", content: siteConfig.locale },
+    { name: "twitter:site", content: siteConfig.twitterHandle },
+    { name: "twitter:creator", content: siteConfig.twitterHandle },
   ];
 }
 
@@ -17,14 +23,9 @@ export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
   { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" },
-  {
-    rel: "stylesheet",
-    href: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css",
-  },
+  { rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" },
+  { rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" },
+  { rel: "canonical", href: siteConfig.url },
 ];
 
 export async function loader({ request, context }: Route.LoaderArgs) {
@@ -34,10 +35,8 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="id">
       <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>

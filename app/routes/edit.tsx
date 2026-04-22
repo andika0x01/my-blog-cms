@@ -3,6 +3,11 @@ import { Editor } from "../components/editor";
 import { Form, redirect, useNavigation } from "react-router";
 import { useState } from "react";
 import { requireUser } from "../utils/session.server";
+import { siteConfig } from "~/config";
+
+export function meta() {
+  return [{ title: `Edit Artikel | ${siteConfig.name}` }];
+}
 
 type Post = {
   id: number;

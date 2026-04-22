@@ -11,15 +11,26 @@ export function meta({ data }: Route.MetaArgs) {
   if (!data?.post) return [{ title: "Not Found" }];
 
   const { title, content, slug } = data.post;
-  const description = content.replace(/<[^>]*>?/gm, "").substring(0, 160);
+  const description =
+    content
+      .replace(/<[^>]*>?/gm, "")
+      .substring(0, 160)
+      .trim() + "...";
+  const postUrl = `${siteConfig.url}/baca/${slug}`;
 
   return [
     { title: `${title} | ${siteConfig.name}` },
     { name: "description", content: description },
     { property: "og:title", content: title },
-    { property: "og:url", content: `${siteConfig.url}/baca/${slug}` },
-    { property: "og:site_name", content: siteConfig.name },
+    { property: "og:description", content: description },
+    { property: "og:url", content: postUrl },
+    { property: "og:type", content: "article" },
+    { property: "og:image", content: siteConfig.ogImage },
+    { property: "article:author", content: siteConfig.author },
     { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: siteConfig.ogImage },
   ];
 }
 

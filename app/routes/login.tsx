@@ -12,7 +12,7 @@ export async function action({ request, context }: Route.ActionArgs) {
   const formData = await request.formData();
   const username = formData.get("username") as string;
   const password = formData.get("password") as string;
-  const { DB, SESSION_SECRET } = context.cloudflare.env;
+  const { DB } = context.cloudflare.env;
 
   const user = await DB.prepare("SELECT id, password FROM users WHERE username = ?").bind(username).first<any>();
 

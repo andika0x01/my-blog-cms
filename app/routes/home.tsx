@@ -9,16 +9,19 @@ export function meta() {
     { property: "og:title", content: siteConfig.title },
     { property: "og:description", content: siteConfig.description },
     { property: "og:url", content: siteConfig.url },
-    { name: "twitter:creator", content: "@andikadinata" },
+    { property: "og:type", content: "website" },
+    { property: "og:image", content: siteConfig.ogImage },
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: siteConfig.title },
+    { name: "twitter:description", content: siteConfig.description },
+    { name: "twitter:image", content: siteConfig.ogImage },
   ];
 }
 
 export async function loader({ context }: Route.LoaderArgs) {
   const db = context.cloudflare.env.DB;
-
   try {
-    const { results } = await db.prepare("SELECT id, title, slug, created_at FROM posts ORDER BY created_at DESC LIMIT 3").all();
-
+    const { results } = await db.prepare("SELECT id, title, slug, created_at FROM posts WHERE is_draft = 0 ORDER BY created_at DESC LIMIT 3").all();
     return { posts: results };
   } catch (error) {
     console.error("Database error:", error);
@@ -50,7 +53,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                   day: "numeric",
                 })}
               </time>
-
               <div className="absolute bottom-0 left-0 h-[1px] w-full bg-white/5">
                 <div className="h-full bg-white/20 w-0 group-hover:w-full transition-all duration-500 ease-out" />
               </div>

@@ -4,7 +4,18 @@ import { getAuthSession } from "../utils/session.server";
 import { siteConfig } from "../config";
 
 export function meta() {
-  return [{ title: `Semua Tulisan | ${siteConfig.name}` }];
+  const title = `Semua Tulisan | ${siteConfig.name}`;
+  const description = "Arsip tulisan dan pemikiran Andika Dinata tentang pemrograman, keamanan siber, dan teknologi.";
+
+  return [
+    { title },
+    { name: "description", content: description },
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:url", content: `${siteConfig.url}/blog` },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ];
 }
 
 export async function loader({ context, request }: Route.LoaderArgs) {
