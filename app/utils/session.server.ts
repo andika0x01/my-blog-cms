@@ -25,3 +25,17 @@ export async function requireUser(request: Request, env: any) {
   if (!userId) throw redirect("/login");
   return userId;
 }
+
+export function getVisitorStorage(env: any) {
+  return createCookieSessionStorage({
+    cookie: {
+      name: "_visitor_identity",
+      sameSite: "lax",
+      path: "/",
+      httpOnly: true,
+      secrets: [env.SESSION_SECRET || "visitor_secret"],
+      secure: true,
+      maxAge: 60 * 60 * 24 * 365,
+    },
+  });
+}

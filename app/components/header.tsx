@@ -2,7 +2,7 @@
 
 import { Link, useLocation, Form } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { House, PenNib, User, GearSix, SignOut, Plus, SignIn } from "@phosphor-icons/react";
+import { House, PenNib, User, GearSix, SignOut, Plus, SignIn, Bell } from "@phosphor-icons/react";
 import { cn } from "../utils/cn";
 import { useState } from "react";
 
@@ -18,6 +18,7 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
 
   const ADMIN_NAV = [
     { path: "/tulis", label: "Tulis", icon: Plus },
+    { path: "/notifikasi", label: "Notifikasi", icon: Bell },
     { path: "/pengaturan", label: "Settings", icon: GearSix },
   ];
 
@@ -71,7 +72,7 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
               <Link
                 key={item.path}
                 to={item.path}
-                className={cn("p-2 rounded-full transition-colors", location.pathname === item.path ? "text-white bg-white/10" : "text-gray-500 hover:text-white")}
+                className={cn("p-2 rounded-full transition-colors relative", location.pathname === item.path ? "text-white bg-white/10" : "text-gray-500 hover:text-white")}
               >
                 <item.icon className="w-5 h-5" />
               </Link>

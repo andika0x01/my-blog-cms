@@ -1,8 +1,9 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse } from "react-router";
 import type { Route } from "./+types/root";
 import { getAuthSession } from "./utils/session.server";
 import { Header } from "./components/header";
 import "./app.css";
+import { ErrorPage } from "./components/error-page";
 
 export function meta() {
   return [
@@ -60,5 +61,28 @@ export default function App({ loaderData }: Route.ComponentProps) {
         <p>© {new Date().getFullYear()} Andika Dinata.</p>
       </footer>
     </div>
+  );
+}
+
+export function ErrorBoundary({ error }: any) {
+  let status = 500;
+  let message = "Internal Server Error";
+
+  if (isRouteErrorResponse(error)) {
+    status = error.status;
+    message = error.data?.message || error.statusText;
+  } else if (error instanceof Error) {
+    message = error.message;
+  }
+
+  return (
+    <Layout>
+      <div className="max-w-[720px] mx-auto w-full px-5 md:px-0">
+        <Header isLoggedIn={false} />
+        <main className="py-12 md:py-16">
+          <ErrorPage status={status} message={message} />
+        </main>
+      </div>
+    </Layout>
   );
 }

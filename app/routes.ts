@@ -11,4 +11,5 @@ export default [
   route("logout", "routes/logout.tsx"),
   route("pengaturan", "routes/pengaturan.tsx"),
   route("edit-page/:slug", "routes/edit-page.tsx"),
+  route("notifikasi", "routes/notifikasi.tsx"),
 ] satisfies RouteConfig;
