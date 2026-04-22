@@ -2,9 +2,10 @@ import type { Route } from "./+types/pengaturan";
 import { Form, useNavigation } from "react-router";
 import { requireUser } from "../utils/session.server";
 import bcrypt from "bcryptjs";
+import { siteConfig } from "~/config";
 
 export function meta() {
-  return [{ title: "Pengaturan | Andika" }];
+  return [{ title: `Pengaturan | ${siteConfig.name}` }];
 }
 
 export async function loader({ request, context }: Route.LoaderArgs) {

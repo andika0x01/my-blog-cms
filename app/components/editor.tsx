@@ -10,9 +10,8 @@ import Youtube from "@tiptap/extension-youtube";
 import { Mathematics } from "@tiptap/extension-mathematics";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
-import { CodeBlock } from "@phosphor-icons/react";
-
-import { TextB, TextItalic, TextStrikethrough, TextHOne, TextHTwo, TextHThree } from "@phosphor-icons/react";
+import { useCallback } from "react";
+import { TextB, TextItalic, TextStrikethrough, TextHOne, TextHTwo, TextHThree, CodeBlock, Link as LinkIcon, LinkBreak } from "@phosphor-icons/react";
 import { cn } from "../utils/cn";
 
 const lowlight = createLowlight(common);
@@ -40,7 +39,9 @@ export function Editor({ onChange, initialContent = "" }: { onChange?: (html: st
       Link.configure({
         openOnClick: false,
         autolink: true,
-        HTMLAttributes: { class: "text-white underline decoration-white/30 underline-offset-4" },
+        HTMLAttributes: {
+          class: "text-white underline decoration-white/30 underline-offset-4 cursor-pointer hover:decoration-white transition-colors",
+        },
       }),
       Youtube.configure({
         width: 720,
@@ -59,6 +60,22 @@ export function Editor({ onChange, initialContent = "" }: { onChange?: (html: st
       },
     },
   });
+
+  const setLink = useCallback(() => {
+    if (!editor) return;
+
+    const previousUrl = editor.getAttributes("link").href;
+    const url = window.prompt("Masukkan URL:", previousUrl);
+
+    if (url === null) return;
+
+    if (url === "") {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+      return;
+    }
+
+    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+  }, [editor]);
 
   if (!editor) return null;
 
@@ -110,6 +127,31 @@ export function Editor({ onChange, initialContent = "" }: { onChange?: (html: st
         >
           <TextStrikethrough weight="bold" className="w-4 h-4" />
         </button>
+
+        <div className="w-[1px] h-4 bg-white/10 mx-1" />
+
+        <button
+          type="button"
+          onClick={setLink}
+          className={cn("p-1.5 rounded-md transition-colors", editor.isActive("link") ? "bg-white/10 text-white" : "text-gray-400 hover:text-white")}
+          title="Tambah/Edit Link"
+        >
+          <LinkIcon weight="bold" className="w-4 h-4" />
+        </button>
+
+        {editor.isActive("link") && (
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().unsetLink().run()}
+            className="p-1.5 rounded-md text-red-400 hover:bg-red-500/10 transition-colors"
+            title="Hapus Link"
+          >
+            <LinkBreak weight="bold" className="w-4 h-4" />
+          </button>
+        )}
+
+        <div className="w-[1px] h-4 bg-white/10 mx-1" />
+
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}

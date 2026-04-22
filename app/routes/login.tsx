@@ -2,9 +2,10 @@ import type { Route } from "./+types/login";
 import { Form, redirect, useNavigation } from "react-router";
 import { getSessionStorage } from "../utils/session.server";
 import bcrypt from "bcryptjs";
+import { siteConfig } from "~/config";
 
 export function meta() {
-  return [{ title: "Login | Andika" }];
+  return [{ title: `Login | ${siteConfig.name}` }];
 }
 
 export async function action({ request, context }: Route.ActionArgs) {

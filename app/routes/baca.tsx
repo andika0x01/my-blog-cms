@@ -26,6 +26,7 @@ type Post = {
   content: string;
   created_at: string;
   slug: string;
+  is_draft: number;
 };
 
 export async function loader({ params, context, request }: Route.LoaderArgs) {
@@ -33,9 +34,13 @@ export async function loader({ params, context, request }: Route.LoaderArgs) {
   const session = await getAuthSession(request, context.cloudflare.env);
   const isLoggedIn = session.has("userId");
 
-  const post = await db.prepare("SELECT id, title, content, created_at, slug FROM posts WHERE slug = ?").bind(params.slug).first<Post>();
+  const post = await db.prepare("SELECT id, title, content, created_at, slug, is_draft FROM posts WHERE slug = ?").bind(params.slug).first<Post>();
 
   if (!post) throw data("Tulisan tidak ditemukan", { status: 404 });
+
+  if (post.is_draft === 1 && !isLoggedIn) {
+    throw data("Maaf, tulisan ini belum dipublikasi.", { status: 404 });
+  }
 
   return { post, isLoggedIn };
 }
@@ -50,16 +55,22 @@ export async function action({ request, context, params }: Route.ActionArgs) {
 }
 
 export default function Baca({ loaderData }: Route.ComponentProps) {
-  const post = loaderData.post as Post;
-  const isLoggedIn = loaderData.isLoggedIn;
+  const { post, isLoggedIn } = loaderData;
 
   return (
     <article className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header className="flex flex-col gap-6">
         <div className="flex flex-col gap-4">
-          <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-tight text-white">{post.title}</h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-tight text-white">{post.title}</h1>
+            {post.is_draft === 1 && (
+              <span className="text-xs bg-white/10 text-gray-400 px-3 py-1 rounded-full uppercase tracking-widest font-bold border border-white/5">Draft</span>
+            )}
+          </div>
+
           <time className="text-sm text-gray-500 font-mono">
-            {new Date(post.created_at || Date.now()).toLocaleDateString("id-ID", {
+            {new Date(post.created_at).toLocaleDateString("id-ID", {
+              weekday: "long",
               year: "numeric",
               month: "long",
               day: "numeric",
@@ -88,7 +99,11 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
       </header>
 
       <div className="h-[1px] w-full bg-white/10" />
-      <div className="prose prose-invert prose-neutral max-w-none text-gray-300" dangerouslySetInnerHTML={{ __html: post.content || "" }} />
+
+      <div
+        className="prose prose-invert prose-neutral max-w-none text-gray-300 prose-a:text-white prose-a:underline prose-a:decoration-white/30 hover:prose-a:decoration-white"
+        dangerouslySetInnerHTML={{ __html: post.content || "" }}
+      />
     </article>
   );
 }
