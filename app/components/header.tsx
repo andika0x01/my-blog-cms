@@ -29,44 +29,64 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
 
       <div className="flex items-center gap-1.5 md:gap-3">
         <nav className="flex items-center gap-0.5 md:gap-1 bg-white/5 border border-white/10 rounded-full p-1 backdrop-blur-xl">
-          {/* ... (Mapping PUBLIC_NAV tetap sama) */}
+          {PUBLIC_NAV.map((item) => {
+            const isActive = location.pathname === item.path || (item.path !== "/" && location.pathname.startsWith(`${item.path}/`));
+            const Icon = item.icon;
 
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "relative px-3 md:px-4 py-2 text-sm transition-colors rounded-full flex items-center gap-2 z-10 font-medium",
+                  isActive ? "text-oled" : "text-gray-400 hover:text-white"
+                )}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="active-nav-indicator"
+                    className="absolute inset-0 bg-accent rounded-full -z-10"
+                    transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                  />
+                )}
+                <Icon weight={isActive ? "fill" : "regular"} className="w-4 h-4 md:w-5 md:h-5" />
+                <span className="hidden md:block">{item.label}</span>
+              </Link>
+            );
+          })}
           {isLoggedIn && (
             <button onClick={() => setShowAdmin(!showAdmin)} className={cn("md:hidden p-2 rounded-full transition-colors", showAdmin ? "text-white bg-white/10" : "text-gray-500")}>
               <Plus className={cn("w-5 h-5 transition-transform", showAdmin && "rotate-45")} />
             </button>
           )}
         </nav>
-
-        {/* Tombol Login (Hanya muncul jika belum login) */}
         {!isLoggedIn && (
-          <Link to="/login" className="p-2.5 text-gray-400 hover:text-white bg-white/5 border border-white/10 rounded-full transition-colors shrink-0" title="Login">
+          <Link to="/login" className="p-2.5 text-gray-400 hover:text-white bg-white/5 border border-white/10 rounded-full transition-colors" title="Masuk">
             <SignIn weight="bold" className="w-4 h-4" />
           </Link>
         )}
-
         {isLoggedIn && (
-          <>
-            <div className="hidden md:flex items-center gap-1 bg-white/5 border border-white/10 rounded-full p-1">
-              {ADMIN_NAV.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={cn("p-2 rounded-full transition-colors", location.pathname === item.path ? "text-white bg-white/10" : "text-gray-500 hover:text-white")}
-                >
-                  <item.icon className="w-5 h-5" />
-                </Link>
-              ))}
-            </div>
-
-            <Form method="post" action="/logout" className="shrink-0">
-              <button type="submit" className="p-2.5 text-gray-400 hover:text-red-400 bg-white/5 border border-white/10 rounded-full transition-colors">
-                <SignOut weight="bold" className="w-4 h-4" />
-              </button>
-            </Form>
-          </>
+          <div className="hidden md:flex items-center gap-1 bg-white/5 border border-white/10 rounded-full p-1">
+            {ADMIN_NAV.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn("p-2 rounded-full transition-colors", location.pathname === item.path ? "text-white bg-white/10" : "text-gray-500 hover:text-white")}
+              >
+                <item.icon className="w-5 h-5" />
+              </Link>
+            ))}
+          </div>
+        )}
+        {isLoggedIn && (
+          <Form method="post" action="/logout" className="shrink-0">
+            <button type="submit" className="p-2.5 text-gray-400 hover:text-red-400 bg-white/5 border border-white/10 rounded-full transition-colors">
+              <SignOut weight="bold" className="w-4 h-4" />
+            </button>
+          </Form>
         )}
       </div>
+
       <AnimatePresence>
         {isLoggedIn && showAdmin && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute top-20 right-0 left-0 p-2 md:hidden">
