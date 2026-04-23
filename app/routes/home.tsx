@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import type { Route } from "./+types/home";
 import { siteConfig } from "../config";
+import { formatDate } from "../utils/date";
 
 export function meta() {
   return [
@@ -46,14 +47,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           posts.map((post: any) => (
             <Link key={post.id} to={`/baca/${post.slug}`} className="group flex flex-col gap-2 relative py-4">
               <h2 className="text-xl md:text-2xl font-medium text-gray-200 group-hover:text-white transition-colors">{post.title}</h2>
-              <time className="text-sm text-gray-500 font-mono">
-                {new Date(post.created_at).toLocaleDateString("id-ID", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  timeZone: "Asia/Jakarta",
-                })}
-              </time>
+              <time className="text-sm text-gray-500 font-mono">{formatDate(post.created_at)}</time>
               <div className="absolute bottom-0 left-0 h-[1px] w-full bg-white/5">
                 <div className="h-full bg-white/20 w-0 group-hover:w-full transition-all duration-500 ease-out" />
               </div>

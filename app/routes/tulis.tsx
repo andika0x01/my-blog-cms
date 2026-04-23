@@ -49,16 +49,16 @@ export default function Tulis({ actionData }: Route.ComponentProps) {
 
   return (
     <Form method="post" className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 w-full">
         <input
           type="text"
           name="title"
           placeholder="Judul tulisan..."
           required
-          className="flex-1 text-4xl md:text-5xl font-medium tracking-tighter bg-transparent border-none outline-none text-white placeholder:text-gray-600 focus:ring-0"
+          className="w-full min-w-0 flex-1 text-4xl md:text-5xl font-medium tracking-tighter bg-transparent border-none outline-none text-white placeholder:text-gray-600 focus:ring-0"
         />
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           <button
             type="submit"
             name="intent"

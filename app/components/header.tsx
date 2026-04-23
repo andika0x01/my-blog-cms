@@ -26,7 +26,7 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
     <header className="py-6 flex items-center justify-between sticky top-0 z-50 bg-oled/80 backdrop-blur-md gap-1">
       <Link to="/" className="text-white font-medium tracking-tight text-sm md:text-xl shrink-0">
         <span className="hidden sm:inline">Andika Dinata</span>
-        <span className="sm :hidden">AD</span>
+        <span className="sm:hidden">AD</span>
         <span className="text-gray-500">.</span>
       </Link>
 

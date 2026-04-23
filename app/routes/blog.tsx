@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import type { Route } from "./+types/blog";
 import { getAuthSession } from "../utils/session.server";
 import { siteConfig } from "../config";
+import { formatDate } from "../utils/date";
 
 export function meta() {
   const title = `Semua Tulisan | ${siteConfig.name}`;
@@ -56,15 +57,7 @@ export default function Blog({ loaderData }: Route.ComponentProps) {
                 )}
               </div>
 
-              <time className="text-sm text-gray-500 font-mono">
-                {new Date(post.created_at).toLocaleDateString("id-ID", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  timeZone: "Asia/Jakarta",
-                })}
-              </time>
+              <time className="text-sm text-gray-500 font-mono">{formatDate(post.created_at)}</time>
 
               <div className="absolute bottom-0 left-0 h-[1px] w-full bg-white/5">
                 <div className="h-full bg-white/20 w-0 group-hover:w-full transition-all duration-500 ease-out" />

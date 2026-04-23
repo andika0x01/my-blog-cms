@@ -7,6 +7,7 @@ import type { Route } from "./+types/baca";
 import { getAuthSession, getVisitorStorage } from "../utils/session.server";
 import { siteConfig } from "../config";
 import { cn } from "../utils/cn";
+import { formatDate } from "../utils/date";
 
 export function meta({ data }: Route.MetaArgs) {
   if (!data?.post) return [{ title: "Not Found" }];
@@ -168,9 +169,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
                 <span className="text-xs bg-white/10 text-zinc-400 px-3 py-1 rounded-full uppercase tracking-widest font-bold border border-white/5">Draft</span>
               )}
             </div>
-            <time className="text-sm text-zinc-500 font-mono italic">
-              {new Date(post.created_at).toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Jakarta" })}
-            </time>
+            <time className="text-sm text-zinc-500 font-mono italic">{formatDate(post.created_at, "dddd, DD MMMM YYYY")}</time>
           </div>
 
           {isLoggedIn && (
@@ -214,12 +213,26 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
               value="like"
               disabled={isButtonDisabled}
               className={cn(
-                "flex items-center gap-2 px-6 py-2.5 rounded-full text-[10px] font-bold tracking-widest uppercase transition-all",
-                isButtonDisabled ? "bg-white/5 text-zinc-600 border border-white/5 cursor-not-allowed" : "bg-white text-zinc-950 hover:scale-105 active:scale-95"
+                "group flex items-center gap-3 px-5 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase transition-all duration-300",
+                isLoggedIn
+                  ? "bg-white/5 text-zinc-600 border border-white/10 cursor-not-allowed" // Mode Author
+                  : isActuallyLiked
+                    ? "bg-rose-500/10 text-rose-400 border border-rose-500/20 cursor-default" // Sudah di-like visitor
+                    : "bg-white text-zinc-950 hover:bg-zinc-200 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(255,255,255,0.1)]" // Belum di-like
               )}
             >
-              <Heart weight={isActuallyLiked ? "fill" : "bold"} className={cn("w-3.5 h-3.5", isActuallyLiked ? "text-red-500" : "")} />
-              {isActuallyLiked ? "Liked" : "Like"} <span className="opacity-80">{likes}</span>
+              <Heart
+                weight={isActuallyLiked ? "fill" : "bold"}
+                className={cn(
+                  "w-4 h-4 transition-transform duration-300",
+                  !isButtonDisabled && "group-hover:scale-110 group-hover:text-rose-500",
+                  isActuallyLiked && "text-rose-500 animate-in zoom-in duration-300"
+                )}
+              />
+              <span>{isActuallyLiked ? "Liked" : "Like"}</span>
+
+              <div className={cn("w-[1px] h-3.5 transition-colors duration-300", isLoggedIn ? "bg-zinc-700" : isActuallyLiked ? "bg-rose-500/30" : "bg-zinc-300")} />
+              <span className="font-mono text-[11px]">{likes}</span>
             </button>
           </Form>
         </div>
@@ -281,34 +294,27 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
 
 function CommentItem({ comment, onReply, isAuthor, isReply, isReplying }: any) {
   return (
-    <motion.div layout className="group flex flex-col gap-2.5">
-      <div className="flex items-center justify-between">
+    <motion.div layout className="flex flex-col gap-2 md:gap-3">
+      <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <span className={cn("text-[15px] font-semibold tracking-tight", isAuthor ? "text-white" : "text-zinc-200")}>{comment.name}</span>
-            {isAuthor && <span className="text-[8px] bg-zinc-200 text-zinc-950 px-1.5 py-0.5 rounded-sm font-black uppercase tracking-tighter">Author</span>}
+            <span className={cn("text-sm md:text-base font-semibold tracking-tight", isAuthor ? "text-white" : "text-zinc-200")}>{comment.name}</span>
+            {isAuthor && <span className="text-[9px] md:text-[10px] bg-zinc-200 text-zinc-950 px-1.5 py-0.5 rounded-sm font-black uppercase tracking-tighter">Author</span>}
           </div>
-          <span className="text-[10px] font-mono text-zinc-600 tracking-wider uppercase">
-            {new Date(comment.created_at).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta" })} —{" "}
-            {new Date(comment.created_at).toLocaleTimeString("id-ID", {
-              hour: "2-digit",
-              minute: "2-digit",
-              timeZone: "Asia/Jakarta",
-            })}
-          </span>
+          <span className="text-[10px] md:text-xs font-mono text-zinc-600 tracking-wider uppercase mt-0.5">{formatDate(comment.created_at, "DD/MM/YYYY — HH:mm")}</span>
         </div>
 
         {!isReplying && (
           <button
             onClick={onReply}
-            className="opacity-0 group-hover:opacity-100 text-[9px] font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition-all flex items-center gap-1.5"
+            className="shrink-0 text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 mt-1"
           >
             <ArrowUDownLeft weight="bold" /> Reply
           </button>
         )}
       </div>
 
-      <p className={cn("text-zinc-400 leading-relaxed max-w-[65ch]", isReply ? "text-sm" : "text-[15px]")}>{comment.content}</p>
+      <p className={cn("text-zinc-400 leading-relaxed max-w-[65ch]", isReply ? "text-sm" : "text-sm md:text-base")}>{comment.content}</p>
     </motion.div>
   );
 }

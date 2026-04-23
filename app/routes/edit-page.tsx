@@ -35,16 +35,19 @@ export default function EditPage({ loaderData }: Route.ComponentProps) {
 
   return (
     <Form method="post" className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 w-full">
         <input
           type="text"
           name="title"
           defaultValue={page.title}
-          className="flex-1 text-4xl font-medium tracking-tighter bg-transparent border-none outline-none text-white focus:ring-0"
+          className="w-full min-w-0 flex-1 text-4xl md:text-5xl font-medium tracking-tighter bg-transparent border-none outline-none text-white focus:ring-0"
         />
-        <button type="submit" className="bg-white text-black px-6 py-2 rounded-full font-medium text-sm transition-transform hover:scale-105 active:scale-95 disabled:opacity-50">
-          {navigation.state === "submitting" ? "Menyimpan..." : "Update Halaman"}
-        </button>
+
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto shrink-0">
+          <button type="submit" className="bg-white text-black px-6 py-2 rounded-full font-medium text-sm transition-transform hover:scale-105 active:scale-95 disabled:opacity-50">
+            {navigation.state === "submitting" ? "Menyimpan..." : "Update Halaman"}
+          </button>
+        </div>
       </div>
       <input type="hidden" name="content" value={content} />
       <Editor initialContent={page.content} onChange={(html) => setContent(html)} />

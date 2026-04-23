@@ -79,7 +79,11 @@ export function Editor({ onChange, initialContent = "" }: { onChange?: (html: st
 
   return (
     <div className="w-full mt-8 relative">
-      <BubbleMenu editor={editor} className="flex items-center gap-1 bg-zinc-900 border border-white/10 shadow-xl rounded-lg px-2 py-1.5 backdrop-blur-md overflow-x-auto">
+      <BubbleMenu
+        editor={editor}
+        {...({ tippyOptions: { placement: "bottom-start", duration: 100 } } as any)}
+        className="flex items-center gap-1 bg-zinc-900 border border-white/10 shadow-xl rounded-lg px-2 py-1.5 backdrop-blur-md overflow-x-auto max-w-[90vw]"
+      >
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
