@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, Form, useSubmit } from "react-router";
 import type { Route } from "./+types/blog";
 import { getAuthSession } from "../utils/session.server";
 import { siteConfig } from "../config";
@@ -24,28 +24,73 @@ export async function loader({ context, request }: Route.LoaderArgs) {
   const session = await getAuthSession(request, context.cloudflare.env);
   const isLoggedIn = session.has("userId");
 
-  const query = isLoggedIn
-    ? "SELECT id, title, slug, created_at, is_draft FROM posts ORDER BY created_at DESC"
-    : "SELECT id, title, slug, created_at, is_draft FROM posts WHERE is_draft = 0 ORDER BY created_at DESC";
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get("page") || "1", 10);
+  const search = url.searchParams.get("q") || "";
+  const limit = 10;
+  const offset = (page - 1) * limit;
 
-  const { results } = await db.prepare(query).all();
+  let baseQuery = isLoggedIn ? "FROM posts WHERE 1=1" : "FROM posts WHERE is_draft = 0";
+
+  const params: (string | number)[] = [];
+
+  if (search) {
+    baseQuery += " AND (title LIKE ? OR content LIKE ?)";
+    params.push(`%${search}%`, `%${search}%`);
+  }
+
+  const countResult = await db
+    .prepare(`SELECT COUNT(*) as total ${baseQuery}`)
+    .bind(...params)
+    .first<{ total: number }>();
+  const totalPosts = countResult?.total || 0;
+  const totalPages = Math.ceil(totalPosts / limit);
+
+  const postsQuery = `SELECT id, title, slug, created_at, is_draft ${baseQuery} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+  const postsParams = [...params, limit, offset];
+
+  const { results } = await db
+    .prepare(postsQuery)
+    .bind(...postsParams)
+    .all();
 
   return {
     posts: results as any[],
     isLoggedIn,
+    page,
+    totalPages,
+    search,
   };
 }
 
 export default function Blog({ loaderData }: Route.ComponentProps) {
-  const { posts, isLoggedIn } = loaderData;
+  const { posts, isLoggedIn, page, totalPages, search } = loaderData;
+  const submit = useSubmit();
+  const searchParam = search ? `&q=${encodeURIComponent(search)}` : "";
 
   return (
     <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <h1 className="text-4xl font-medium tracking-tighter text-white">Semua Tulisan.</h1>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <h1 className="text-4xl font-medium tracking-tighter text-white">Semua Tulisan.</h1>
+        <Form method="get" className="relative w-full md:w-64" onChange={(e) => submit(e.currentTarget)}>
+          <input
+            type="text"
+            name="q"
+            defaultValue={search}
+            placeholder="Cari tulisan..."
+            className="w-full bg-white/5 border border-white/10 rounded-full px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-white/30 transition-colors"
+          />
+          {search && (
+            <Link to="/blog" className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white">
+              ✕
+            </Link>
+          )}
+        </Form>
+      </div>
 
       <div className="flex flex-col gap-8">
         {posts.length === 0 ? (
-          <p className="text-gray-500 italic">Belum ada tulisan.</p>
+          <p className="text-gray-500 italic">{search ? `Tidak ada tulisan yang cocok dengan "${search}".` : "Belum ada tulisan."}</p>
         ) : (
           posts.map((post: any) => (
             <Link key={post.id} to={`/baca/${post.slug}`} className="group flex flex-col gap-2 relative py-4">
@@ -66,6 +111,37 @@ export default function Blog({ loaderData }: Route.ComponentProps) {
           ))
         )}
       </div>
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-white/5">
+          <div className="text-sm font-mono text-gray-500">
+            Halaman {page} dari {totalPages}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {page > 1 ? (
+              <Link
+                to={`/blog?page=${page - 1}${searchParam}`}
+                className="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all"
+              >
+                Sebelumnya
+              </Link>
+            ) : (
+              <span className="px-5 py-2 bg-transparent text-gray-600 text-sm cursor-not-allowed">Sebelumnya</span>
+            )}
+
+            {page < totalPages ? (
+              <Link
+                to={`/blog?page=${page + 1}${searchParam}`}
+                className="px-5 py-2 bg-white text-black rounded-full text-sm font-medium hover:scale-105 active:scale-95 transition-all"
+              >
+                Selanjutnya
+              </Link>
+            ) : (
+              <span className="px-5 py-2 bg-transparent text-gray-600 text-sm cursor-not-allowed">Selanjutnya</span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
