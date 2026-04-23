@@ -13,8 +13,7 @@
 @layer base {
   html,
   body {
-    @apply bg-oled text-gray-400 antialiased min-h-[100dvh] overflow-x-hidden;
-    /* Memaksa dark mode secara default karena ini tema dominan gelap */
+    @apply bg-oled text-gray-400 antialiased min-h-[100dvh] overflow-x-hidden overflow-y-scroll;
     color-scheme: dark;
   }
 
