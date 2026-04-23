@@ -2,7 +2,7 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse }
 import type { Route } from "./+types/root";
 import { getAuthSession } from "./utils/session.server";
 import { Header } from "./components/header";
-import "./app.css";
+import appCss from "./app.css?url";
 import { ErrorPage } from "./components/error-page";
 import { siteConfig } from "./config";
 
@@ -18,6 +18,7 @@ export function meta() {
 }
 
 export const links: Route.LinksFunction = () => [
+  { rel: "stylesheet", href: appCss },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
   { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" },
