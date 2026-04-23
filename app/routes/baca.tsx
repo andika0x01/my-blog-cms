@@ -70,6 +70,16 @@ export async function loader({ params, context, request }: Route.LoaderArgs) {
     throw data("Maaf, tulisan ini belum dipublikasi.", { status: 404 });
   }
 
+  const prevPost = await db
+    .prepare("SELECT slug, title FROM posts WHERE created_at < ? AND is_draft = 0 ORDER BY created_at DESC LIMIT 1")
+    .bind(post.created_at)
+    .first<{ slug: string; title: string }>();
+
+  const nextPost = await db
+    .prepare("SELECT slug, title FROM posts WHERE created_at > ? AND is_draft = 0 ORDER BY created_at ASC LIMIT 1")
+    .bind(post.created_at)
+    .first<{ slug: string; title: string }>();
+
   const likesCount = await db.prepare("SELECT COUNT(*) as total FROM likes WHERE post_id = ?").bind(post.id).first<any>();
 
   const commentsData = await db.prepare("SELECT id, name, content, created_at, parent_id FROM comments WHERE post_id = ? ORDER BY created_at ASC").bind(post.id).all();
@@ -82,6 +92,8 @@ export async function loader({ params, context, request }: Route.LoaderArgs) {
     visitorName,
     visitorHasLiked,
     adminUsername,
+    prevPost,
+    nextPost,
   };
 }
 
@@ -134,7 +146,7 @@ export async function action({ request, context, params }: Route.ActionArgs) {
 }
 
 export default function Baca({ loaderData }: Route.ComponentProps) {
-  const { post, isLoggedIn, likes, comments, visitorName, visitorHasLiked, adminUsername } = loaderData;
+  const { post, isLoggedIn, likes, comments, visitorName, visitorHasLiked, adminUsername, prevPost, nextPost } = loaderData;
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
 
   const isActuallyLiked = !isLoggedIn && visitorHasLiked;
@@ -198,6 +210,26 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
         <div className="prose prose-invert prose-neutral max-w-none text-zinc-300 text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: post.content || "" }} />
       </article>
 
+      <nav className="flex flex-col md:flex-row justify-between gap-4 mt-8 pt-8 border-t border-white/5">
+        {prevPost ? (
+          <Link to={`/baca/${prevPost.slug}`} className="group flex flex-col gap-2 w-full md:w-1/2 text-left">
+            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">← Sebelumnya</span>
+            <span className="text-zinc-300 group-hover:text-white font-medium transition-colors">{prevPost.title}</span>
+          </Link>
+        ) : (
+          <div className="w-full md:w-1/2" />
+        )}
+
+        {nextPost ? (
+          <Link to={`/baca/${nextPost.slug}`} className="group flex flex-col gap-2 w-full md:w-1/2 text-left md:text-right">
+            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Selanjutnya →</span>
+            <span className="text-zinc-300 group-hover:text-white font-medium transition-colors">{nextPost.title}</span>
+          </Link>
+        ) : (
+          <div className="w-full md:w-1/2" />
+        )}
+      </nav>
+
       <section className="flex flex-col gap-10 mt-12">
         <div className="flex items-center justify-between pt-8 border-t border-white/5">
           <div className="flex items-center gap-2 text-zinc-500">
@@ -215,10 +247,10 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
               className={cn(
                 "group flex items-center gap-3 px-5 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase transition-all duration-300",
                 isLoggedIn
-                  ? "bg-white/5 text-zinc-600 border border-white/10 cursor-not-allowed" // Mode Author
+                  ? "bg-white/5 text-zinc-600 border border-white/10 cursor-not-allowed"
                   : isActuallyLiked
-                    ? "bg-rose-500/10 text-rose-400 border border-rose-500/20 cursor-default" // Sudah di-like visitor
-                    : "bg-white text-zinc-950 hover:bg-zinc-200 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(255,255,255,0.1)]" // Belum di-like
+                    ? "bg-rose-500/10 text-rose-400 border border-rose-500/20 cursor-default"
+                    : "bg-white text-zinc-950 hover:bg-zinc-200 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(255,255,255,0.1)]"
               )}
             >
               <Heart
