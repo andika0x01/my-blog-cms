@@ -167,7 +167,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
   }, [comments]);
 
   return (
-    <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[100dvh]">
+    <div key={post.slug} className="flex flex-col gap-12 animate-in fade-in duration-700">
       <Link to="/blog" className="group flex items-center gap-2 text-sm text-zinc-500 hover:text-white transition-colors w-fit font-mono">
         <ArrowLeft className="group-hover:-translate-x-1 transition-transform" /> /root/blog
       </Link>
