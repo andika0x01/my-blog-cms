@@ -81,8 +81,8 @@ export function Editor({ onChange, initialContent = "" }: { onChange?: (html: st
     <div className="w-full mt-8 relative">
       <BubbleMenu
         editor={editor}
-        {...({ tippyOptions: { placement: "bottom-start", duration: 100 } } as any)}
-        className="flex items-center gap-1 bg-zinc-900 border border-white/10 shadow-xl rounded-lg px-2 py-1.5 backdrop-blur-md overflow-x-auto max-w-[90vw]"
+        {...({ tippyOptions: { duration: 100 } } as any)}
+        className="flex items-center gap-1 bg-zinc-900 border border-white/10 shadow-xl rounded-lg px-2 py-1.5 backdrop-blur-md overflow-x-auto max-w-[90vw] translate-y-20 sm:translate-y-0"
       >
         <button
           type="button"
