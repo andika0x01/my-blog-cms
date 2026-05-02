@@ -45,7 +45,7 @@ CREATE TABLE comments (
   name TEXT NOT NULL,
   content TEXT NOT NULL,
   is_read INTEGER DEFAULT 0,
-  visitor_read INTEGER DEFAULT 0,
+  is_visitor_read INTEGER DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
   FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE

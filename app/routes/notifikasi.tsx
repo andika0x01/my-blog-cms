@@ -52,7 +52,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
         JOIN posts p ON c.post_id = p.id 
         JOIN comments parent ON c.parent_id = parent.id
         WHERE parent.name = ? AND c.name != ?
-        ORDER BY c.visitor_read ASC, c.created_at DESC
+        ORDER BY c.is_visitor_read ASC, c.created_at DESC
       `
         )
         .bind(visitorName, visitorName)
@@ -85,11 +85,11 @@ export async function action({ request, context }: Route.ActionArgs) {
       try {
         await db.prepare(`
           UPDATE comments 
-          SET visitor_read = 1 
+          SET is_visitor_read = 1 
           WHERE id IN (
             SELECT c.id FROM comments c
             JOIN comments p ON c.parent_id = p.id
-            WHERE p.name = ? AND c.name != ? AND c.visitor_read = 0
+            WHERE p.name = ? AND c.name != ? AND c.is_visitor_read = 0
           )
         `).bind(visitorName, visitorName).run();
       } catch (e) {}
@@ -102,7 +102,7 @@ export default function Notifikasi({ loaderData }: Route.ComponentProps) {
   const navigation = useNavigation();
   const isUpdating = navigation.state === "submitting";
   const { comments, isLoggedIn, isCheckingVisitor } = loaderData;
-  const unreadCount = comments.filter((c: any) => isLoggedIn ? c.is_read === 0 : c.visitor_read === 0).length;
+  const unreadCount = comments.filter((c: any) => isLoggedIn ? c.is_read === 0 : c.is_visitor_read === 0).length;
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -133,7 +133,7 @@ export default function Notifikasi({ loaderData }: Route.ComponentProps) {
           </div>
         ) : (
           comments.map((c: any) => {
-            const isUnread = isLoggedIn ? c.is_read === 0 : c.visitor_read === 0;
+            const isUnread = isLoggedIn ? c.is_read === 0 : c.is_visitor_read === 0;
             return (
             <Link
               key={c.id}

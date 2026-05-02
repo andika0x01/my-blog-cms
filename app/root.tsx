@@ -57,7 +57,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
         SELECT COUNT(*) as count 
         FROM comments c 
         JOIN comments p ON c.parent_id = p.id 
-        WHERE p.name = ? AND c.name != ? AND c.visitor_read = 0
+        WHERE p.name = ? AND c.name != ? AND c.is_visitor_read = 0
         `
         )
         .bind(visitorName, visitorName)
