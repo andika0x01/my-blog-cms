@@ -6,7 +6,17 @@ import { House, PenNib, User, GearSix, SignOut, Plus, SignIn, Bell } from "@phos
 import { cn } from "../utils/cn";
 import { useState } from "react";
 
-export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
+export function Header({ 
+  isLoggedIn, 
+  adminUnreadCount = 0, 
+  visitorUnreadCount = 0,
+  isVisitor = false
+}: { 
+  isLoggedIn: boolean; 
+  adminUnreadCount?: number; 
+  visitorUnreadCount?: number; 
+  isVisitor?: boolean;
+}) {
   const location = useLocation();
   const [showAdmin, setShowAdmin] = useState(false);
 
@@ -62,23 +72,37 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
             <button
               type="button"
               onClick={() => setShowAdmin(!showAdmin)}
-              className={cn("md:hidden p-2 rounded-full transition-colors", showAdmin ? "text-white bg-white/10" : "text-gray-500")}
+              className={cn("md:hidden p-2 rounded-full transition-colors relative", showAdmin ? "text-white bg-white/10" : "text-gray-500")}
             >
               <Plus className={cn("w-4 h-4 transition-transform", showAdmin && "rotate-45")} />
+              {adminUnreadCount > 0 && !showAdmin && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
             </button>
           )}
         </nav>
 
         {!isLoggedIn && (
-          <Link to="/login" className="p-2 md:p-2.5 text-gray-400 hover:text-white bg-white/5 border border-white/10 rounded-full transition-colors" title="Masuk">
-            <SignIn weight="bold" className="w-4 h-4" />
-          </Link>
+          <div className="flex items-center gap-1 md:gap-3">
+            <Link to="/notifikasi" className="p-2 md:p-2.5 text-gray-400 hover:text-white bg-white/5 border border-white/10 rounded-full transition-colors relative" title="Notifikasi Anda">
+              <Bell className="w-4 h-4" />
+              {visitorUnreadCount > 0 && (
+                <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {visitorUnreadCount > 9 ? "9+" : visitorUnreadCount}
+                </span>
+              )}
+            </Link>
+            <Link to="/login" className="p-2 md:p-2.5 text-gray-400 hover:text-white bg-white/5 border border-white/10 rounded-full transition-colors" title="Masuk">
+              <SignIn weight="bold" className="w-4 h-4" />
+            </Link>
+          </div>
         )}
 
         {isLoggedIn && (
           <div className="hidden md:flex items-center gap-1 bg-white/5 border border-white/10 rounded-full p-1">
             {ADMIN_NAV.map((item) => {
               const AdminIcon = item.icon;
+              const hasNotification = item.path === "/notifikasi" && adminUnreadCount > 0;
               return (
                 <Link
                   key={item.path}
@@ -86,6 +110,11 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
                   className={cn("p-2 rounded-full transition-colors relative", location.pathname === item.path ? "text-white bg-white/10" : "text-gray-500 hover:text-white")}
                 >
                   <AdminIcon className="w-5 h-5" />
+                  {hasNotification && (
+                    <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                      {adminUnreadCount > 9 ? "9+" : adminUnreadCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

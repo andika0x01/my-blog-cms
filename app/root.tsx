@@ -1,6 +1,6 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse } from "react-router";
 import type { Route } from "./+types/root";
-import { getAuthSession } from "./utils/session.server";
+import { getAuthSession, getVisitorStorage } from "./utils/session.server";
 import { Header } from "./components/header";
 import appCss from "./app.css?url";
 import { ErrorPage } from "./components/error-page";
@@ -29,7 +29,47 @@ export const links: Route.LinksFunction = () => [
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   const session = await getAuthSession(request, context.cloudflare.env);
-  return { isLoggedIn: session.has("userId") };
+  const isLoggedIn = session.has("userId");
+
+  const visitorStorage = getVisitorStorage(context.cloudflare.env);
+  const visitorSession = await visitorStorage.getSession(request.headers.get("Cookie"));
+  const visitorName = visitorSession.get("name") || "";
+
+  const db = context.cloudflare.env.DB;
+  let adminUnreadCount = 0;
+  let visitorUnreadCount = 0;
+
+  try {
+    if (isLoggedIn) {
+      const userId = session.get("userId");
+      const user = await db.prepare("SELECT username FROM users WHERE id = ?").bind(userId).first<{ username: string }>();
+      const adminName = user?.username || "admin";
+
+      const resAdmin = await db.prepare("SELECT COUNT(*) as count FROM comments WHERE is_read = 0 AND name != ?").bind(adminName).first();
+      adminUnreadCount = (resAdmin as any)?.count || 0;
+    }
+
+    if (visitorName) {
+      // Find replies to the visitor's comments that haven't been read by the visitor
+      const resVisitor = await db
+        .prepare(
+          `
+        SELECT COUNT(*) as count 
+        FROM comments c 
+        JOIN comments p ON c.parent_id = p.id 
+        WHERE p.name = ? AND c.name != ? AND c.visitor_read = 0
+        `
+        )
+        .bind(visitorName, visitorName)
+        .first();
+      visitorUnreadCount = (resVisitor as any)?.count || 0;
+    }
+  } catch (error) {
+    // Gracefully handle if visitor_read column doesn't exist yet during migration
+    console.error("Error fetching notification counts:", error);
+  }
+
+  return { isLoggedIn, adminUnreadCount, visitorUnreadCount, isVisitor: !!visitorName };
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -54,7 +94,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App({ loaderData }: Route.ComponentProps) {
   return (
     <div className="max-w-[720px] mx-auto w-full px-5 md:px-0 min-h-[100dvh] flex flex-col break-words overflow-x-hidden">
-      <Header isLoggedIn={loaderData.isLoggedIn} />
+      <Header 
+        isLoggedIn={loaderData.isLoggedIn} 
+        adminUnreadCount={loaderData.adminUnreadCount} 
+        visitorUnreadCount={loaderData.visitorUnreadCount} 
+        isVisitor={loaderData.isVisitor}
+      />
       <main className="flex-1 py-12 md:py-16">
         <Outlet />
       </main>
