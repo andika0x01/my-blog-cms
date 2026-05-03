@@ -3,20 +3,20 @@ import { Link } from "react-router";
 export function ErrorPage({ status, message }: { status: number; message: string }) {
   const config = {
     404: {
-      title: "Halaman Hilang.",
-      desc: "Mungkin sudah dihapus atau kamu salah mengetik URL.",
+      title: "Page Not Found.",
+      desc: "Maybe it was deleted or you mistyped the URL.",
     },
     403: {
-      title: "Akses Ditolak.",
-      desc: "Kamu tidak punya izin untuk melihat halaman rahasia ini.",
+      title: "Access Denied.",
+      desc: "You don't have permission to view this page.",
     },
     500: {
-      title: "Sistem Error.",
-      desc: "Ada masalah di server kami. Coba muat ulang nanti.",
+      title: "System Error.",
+      desc: "There is an issue on our server. Please try again later.",
     },
   }[status as 404 | 403 | 500] || {
-    title: "Terjadi Kesalahan.",
-    desc: "Sistem mendeteksi kesalahan yang tidak terduga.",
+    title: "An Error Occurred.",
+    desc: "The system detected an unexpected error.",
   };
 
   return (
@@ -30,7 +30,7 @@ export function ErrorPage({ status, message }: { status: number; message: string
       <p className="text-gray-500 text-sm md:text-base leading-relaxed mb-10">{message || config.desc}</p>
 
       <Link to="/" className="text-xs font-mono tracking-widest uppercase text-gray-400 hover:text-white border-b border-transparent hover:border-white/50 transition-all pb-1">
-        ← Kembali ke Beranda
+        ← Back to Home
       </Link>
     </div>
   );

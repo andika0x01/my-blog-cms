@@ -71,7 +71,7 @@ export default function Edit({ loaderData }: Route.ComponentProps) {
               post.is_draft === 1 ? "bg-white/5 border-white/20 text-white" : "border-white/10 text-gray-400 hover:text-white"
             }`}
           >
-            {isSubmitting ? "..." : post.is_draft === 1 ? "Simpan Draft" : "Jadikan Draft"}
+            {isSubmitting ? "..." : post.is_draft === 1 ? "Save Draft" : "Revert to Draft"}
           </button>
 
           <button

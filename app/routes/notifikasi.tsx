@@ -111,7 +111,7 @@ export default function Notifikasi({ loaderData }: Route.ComponentProps) {
     <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-end justify-between border-b border-white/5 pb-6">
         <div>
-          <h1 className="text-4xl font-medium tracking-tighter text-white">Notifikasi{isCheckingVisitor ? " Anda." : "."}</h1>
+          <h1 className="text-4xl font-medium tracking-tighter text-white">Notifications.</h1>
           <p className="text-xs font-mono text-gray-600 mt-2 uppercase tracking-widest">{unreadCount} UNREAD MESSAGES</p>
         </div>
 

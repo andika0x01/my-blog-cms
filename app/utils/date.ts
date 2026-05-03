@@ -1,11 +1,11 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import "dayjs/locale/id";
+import "dayjs/locale/en";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.locale("id");
+dayjs.locale("en");
 
 export function formatDate(dateString: string, formatStr: string = "DD MMMM YYYY"): string {
   return dayjs.utc(dateString).tz("Asia/Jakarta").format(formatStr);

@@ -20,7 +20,7 @@ export async function action({ request, context }: Route.ActionArgs) {
   const user = await DB.prepare("SELECT id, password FROM users WHERE username = ?").bind(username).first<any>();
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    return { error: "Username atau password salah." };
+    return { error: "Incorrect username or password." };
   }
 
   const storage = getSessionStorage(context.cloudflare.env);
@@ -41,7 +41,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
       <div className="w-full max-w-sm space-y-8">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-medium tracking-tight text-white">Login.</h1>
-          <p className="text-gray-400">Masuk untuk mengelola tulisan.</p>
+          <p className="text-gray-400">Sign in to manage posts.</p>
         </div>
 
         <Form method="post" className="space-y-4">
@@ -69,7 +69,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
             disabled={isSubmitting}
             className="w-full bg-white text-black py-3 rounded-full font-medium mt-4 hover:scale-[0.98] active:scale-95 transition-transform disabled:opacity-50"
           >
-            {isSubmitting ? "Memproses..." : "Masuk"}
+            {isSubmitting ? "Processing..." : "Sign In"}
           </button>
         </Form>
       </div>

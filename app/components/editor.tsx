@@ -31,7 +31,7 @@ export function Editor({ onChange, initialContent = "" }: { onChange?: (html: st
       }),
       Mathematics,
       Placeholder.configure({
-        placeholder: "Tulis sesuatu yang bermakna...",
+        placeholder: "Write something meaningful...",
         emptyEditorClass: "is-editor-empty",
       }),
       Image.configure({
@@ -73,7 +73,7 @@ export function Editor({ onChange, initialContent = "" }: { onChange?: (html: st
     if (!editor) return;
 
     const previousUrl = editor.getAttributes("link").href;
-    const url = window.prompt("Masukkan URL:", previousUrl);
+    const url = window.prompt("Enter URL:", previousUrl);
 
     if (url === null) return;
 
@@ -151,7 +151,7 @@ export function Editor({ onChange, initialContent = "" }: { onChange?: (html: st
           type="button"
           onClick={() => editor.chain().focus().unsetLink().run()}
           className="p-1.5 rounded-md text-red-400 hover:bg-red-500/10 transition-colors shrink-0"
-          title="Hapus Link"
+          title="Remove Link"
         >
           <LinkBreak weight="bold" className="w-4 h-4" />
         </button>

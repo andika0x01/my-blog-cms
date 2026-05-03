@@ -94,7 +94,7 @@ export default function Blog({ loaderData }: Route.ComponentProps) {
 
       <div className="flex flex-col gap-8">
         {posts.length === 0 ? (
-          <p className="text-gray-500 italic">{search ? `Tidak ada tulisan yang cocok dengan "${search}".` : "Belum ada tulisan."}</p>
+          <p className="text-gray-500 italic">{search ? `No posts matched with "${search}".` : "No posts published yet."}</p>
         ) : (
           posts.map((post: any) => (
             <Link key={post.id} to={`/baca/${post.slug}`} className="group flex flex-col gap-2 relative py-4">
@@ -118,7 +118,7 @@ export default function Blog({ loaderData }: Route.ComponentProps) {
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-white/5">
           <div className="text-sm font-mono text-gray-500">
-            Halaman {page} dari {totalPages}
+            Page {page} of {totalPages}
           </div>
 
           <div className="flex items-center gap-2">
@@ -127,10 +127,10 @@ export default function Blog({ loaderData }: Route.ComponentProps) {
                 to={`/blog?page=${page - 1}${searchParam}`}
                 className="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all"
               >
-                Sebelumnya
+                Previous
               </Link>
             ) : (
-              <span className="px-5 py-2 bg-transparent text-gray-600 text-sm cursor-not-allowed">Sebelumnya</span>
+              <span className="px-5 py-2 bg-transparent text-gray-600 text-sm cursor-not-allowed">Previous</span>
             )}
 
             {page < totalPages ? (
@@ -138,10 +138,10 @@ export default function Blog({ loaderData }: Route.ComponentProps) {
                 to={`/blog?page=${page + 1}${searchParam}`}
                 className="px-5 py-2 bg-white text-black rounded-full text-sm font-medium hover:scale-105 active:scale-95 transition-all"
               >
-                Selanjutnya
+                Next
               </Link>
             ) : (
-              <span className="px-5 py-2 bg-transparent text-gray-600 text-sm cursor-not-allowed">Selanjutnya</span>
+              <span className="px-5 py-2 bg-transparent text-gray-600 text-sm cursor-not-allowed">Next</span>
             )}
           </div>
         </div>

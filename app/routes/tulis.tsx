@@ -25,7 +25,7 @@ export async function action({ request, context }: Route.ActionArgs) {
   const intent = formData.get("intent") as string;
 
   if (!title || !content) {
-    return { error: "Judul dan konten wajib diisi." };
+    return { error: "Title and content are required." };
   }
 
   const slug = title
@@ -39,7 +39,7 @@ export async function action({ request, context }: Route.ActionArgs) {
   try {
     await db.prepare("INSERT INTO posts (slug, title, content, is_draft) VALUES (?, ?, ?, ?)").bind(slug, title, content, isDraft).run();
   } catch (error) {
-    return { error: "Gagal menyimpan. Pastikan judul unik agar slug tidak bentrok." };
+    return { error: "Failed to save. Ensure title is unique to avoid slug collision." };
   }
 
   return redirect(isDraft ? "/blog" : "/");
@@ -56,7 +56,7 @@ export default function Tulis({ actionData }: Route.ComponentProps) {
         <input
           type="text"
           name="title"
-          placeholder="Judul tulisan..."
+          placeholder="Post title..."
           required
           className="w-full min-w-0 flex-1 text-4xl md:text-5xl font-medium tracking-tighter bg-transparent border-none outline-none text-white placeholder:text-gray-600 focus:ring-0"
         />
@@ -69,7 +69,7 @@ export default function Tulis({ actionData }: Route.ComponentProps) {
             disabled={isSubmitting}
             className="px-6 py-2 rounded-full font-medium text-sm border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-all disabled:opacity-50"
           >
-            {isSubmitting ? "..." : "Simpan Draft"}
+            {isSubmitting ? "..." : "Save Draft"}
           </button>
 
           <button

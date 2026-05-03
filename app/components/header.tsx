@@ -92,7 +92,7 @@ export function Header({
                 </span>
               )}
             </Link>
-            <Link to="/login" className="p-2 md:p-2.5 text-gray-400 hover:text-white bg-white/5 border border-white/10 rounded-full transition-colors" title="Masuk">
+            <Link to="/login" className="p-2 md:p-2.5 text-gray-400 hover:text-white bg-white/5 border border-white/10 rounded-full transition-colors" title="Sign In">
               <SignIn weight="bold" className="w-4 h-4" />
             </Link>
           </div>

@@ -82,10 +82,10 @@ export async function loader({ params, context, request }: Route.LoaderArgs) {
 
   const post = await db.prepare("SELECT id, title, content, created_at, slug, is_draft FROM posts WHERE slug = ?").bind(params.slug).first<Post>();
 
-  if (!post) throw data("Tulisan tidak ditemukan", { status: 404 });
+  if (!post) throw data("Post not found", { status: 404 });
 
   if (post.is_draft === 1 && !isLoggedIn) {
-    throw data("Maaf, tulisan ini belum dipublikasi.", { status: 404 });
+    throw data("Sorry, this post hasn't been published yet.", { status: 404 });
   }
 
   const prevPost = await db
@@ -210,14 +210,14 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
               >
                 <PencilSimple size={16} /> Edit
               </Link>
-              <Form method="post" onSubmit={(e) => !confirm("Hapus tulisan ini?") && e.preventDefault()}>
+              <Form method="post" onSubmit={(e) => !confirm("Delete this post?") && e.preventDefault()}>
                 <button
                   type="submit"
                   name="intent"
                   value="delete"
                   className="flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full text-sm text-red-400 hover:bg-red-500/20 transition-all"
                 >
-                  <Trash size={16} /> Hapus
+                  <Trash size={16} /> Delete
                 </button>
               </Form>
             </div>
@@ -252,7 +252,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
         <div className="flex items-center justify-between pt-8 border-t border-white/5">
           <div className="flex items-center gap-2 text-zinc-500">
             <ChatCircle size={22} weight="duotone" />
-            <span className="font-mono text-xs tracking-widest uppercase">{comments.length} Respon</span>
+            <span className="font-mono text-xs tracking-widest uppercase">{comments.length} Responses</span>
           </div>
 
           <Form method="post">
@@ -289,7 +289,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
 
         {!replyingTo && (
           <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <CommentForm post_id={post.id} visitorName={visitorName} isLoggedIn={isLoggedIn} title="Tulis Komentar" />
+            <CommentForm post_id={post.id} visitorName={visitorName} isLoggedIn={isLoggedIn} title="Write a comment" />
           </motion.div>
         )}
 
@@ -405,7 +405,7 @@ function CommentForm({ post_id, parent_id, visitorName, isLoggedIn, onCancel, au
           <input
             type="text"
             name="name"
-            placeholder="Nama..."
+            placeholder="Name..."
             required
             className="bg-zinc-900/50 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-zinc-700"
           />
@@ -413,7 +413,7 @@ function CommentForm({ post_id, parent_id, visitorName, isLoggedIn, onCancel, au
 
         <textarea
           name="content"
-          placeholder={parent_id ? "Balas komentar..." : "Tulis pikiran anda..."}
+          placeholder={parent_id ? "Reply to comment..." : "Write your thoughts..."}
           required
           rows={2}
           autoFocus={autoFocus}
@@ -438,7 +438,7 @@ function CommentForm({ post_id, parent_id, visitorName, isLoggedIn, onCancel, au
           ) : (
             <PaperPlaneTilt weight="bold" size={12} />
           )}
-          {isSubmitting ? "Satu momen..." : "Kirim"}
+          {isSubmitting ? "One moment..." : "Send"}
         </button>
       </div>
     </Form>

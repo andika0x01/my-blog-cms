@@ -27,9 +27,9 @@ export async function action({ request, context }: Route.ActionArgs) {
 
   try {
     await db.prepare("UPDATE users SET username = ?, password = ? WHERE id = ?").bind(username, hashedPassword, userId).run();
-    return { success: "Profil berhasil diperbarui dengan enkripsi Bcrypt." };
+    return { success: "Profile updated successfully (Bcrypt)." };
   } catch (error) {
-    return { error: "Gagal memperbarui profil." };
+    return { error: "Failed to update profile." };
   }
 }
 
@@ -40,8 +40,8 @@ export default function Pengaturan({ actionData }: Route.ComponentProps) {
   return (
     <div className="flex flex-col gap-10 max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="space-y-2">
-        <h1 className="text-4xl font-medium tracking-tighter text-white">Pengaturan.</h1>
-        <p className="text-gray-400">Perbarui kredensial login Anda.</p>
+        <h1 className="text-4xl font-medium tracking-tighter text-white">Settings.</h1>
+        <p className="text-gray-400">Update your login credentials.</p>
       </div>
 
       <Form method="post" className="space-y-4">
@@ -49,14 +49,14 @@ export default function Pengaturan({ actionData }: Route.ComponentProps) {
           <input
             type="text"
             name="username"
-            placeholder="Username Baru"
+            placeholder="New Username"
             required
             className="w-full bg-transparent border-b border-white/10 px-0 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-white transition-colors"
           />
           <input
             type="password"
             name="password"
-            placeholder="Password Baru"
+            placeholder="New Password"
             required
             className="w-full bg-transparent border-b border-white/10 px-0 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-white transition-colors"
           />
@@ -70,7 +70,7 @@ export default function Pengaturan({ actionData }: Route.ComponentProps) {
           disabled={isSubmitting}
           className="w-full bg-white text-black py-3 rounded-full font-medium mt-4 hover:scale-[0.98] active:scale-95 transition-transform disabled:opacity-50"
         >
-          {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
+          {isSubmitting ? "Saving..." : "Save Changes"}
         </button>
       </Form>
     </div>
