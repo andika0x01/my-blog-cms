@@ -7,7 +7,10 @@ import { siteConfig } from "~/config";
 import { formatDate } from "../utils/date";
 
 export function meta() {
-  return [{ title: `Notifikasi | ${siteConfig.name}` }];
+  return [
+    { title: `Notifications | ${siteConfig.name}` },
+    { name: "robots", content: "noindex, nofollow" }
+  ];
 }
 
 export async function loader({ request, context }: Route.LoaderArgs) {

@@ -5,8 +5,8 @@ import { siteConfig } from "../config";
 import { formatDate } from "../utils/date";
 
 export function meta() {
-  const title = `Semua Tulisan | ${siteConfig.name}`;
-  const description = "Arsip tulisan dan pemikiran Andika Dinata tentang pemrograman, keamanan siber, dan teknologi.";
+  const title = `Blog | ${siteConfig.name}`;
+  const description = `Read the latest articles and thoughts from ${siteConfig.author}.`;
 
   return [
     { title },
@@ -15,7 +15,11 @@ export function meta() {
     { property: "og:description", content: description },
     { property: "og:url", content: `${siteConfig.url}/blog` },
     { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
+    { property: "og:image", content: siteConfig.ogImage },
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: siteConfig.ogImage },
   ];
 }
 
@@ -71,13 +75,13 @@ export default function Blog({ loaderData }: Route.ComponentProps) {
   return (
     <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <h1 className="text-4xl font-medium tracking-tighter text-white">Semua Tulisan.</h1>
+        <h1 className="text-4xl font-medium tracking-tighter text-white">All Posts.</h1>
         <Form method="get" className="relative w-full md:w-64" onChange={(e) => submit(e.currentTarget)}>
           <input
             type="text"
             name="q"
             defaultValue={search}
-            placeholder="Cari tulisan..."
+            placeholder="Search posts..."
             className="w-full bg-white/5 border border-white/10 rounded-full px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-white/30 transition-colors"
           />
           {search && (

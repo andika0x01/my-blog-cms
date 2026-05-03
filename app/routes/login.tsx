@@ -5,7 +5,10 @@ import bcrypt from "bcryptjs";
 import { siteConfig } from "~/config";
 
 export function meta() {
-  return [{ title: `Login | ${siteConfig.name}` }];
+  return [
+    { title: `Login | ${siteConfig.name}` },
+    { name: "robots", content: "noindex, nofollow" }
+  ];
 }
 
 export async function action({ request, context }: Route.ActionArgs) {

@@ -6,7 +6,10 @@ import { siteConfig } from "../config";
 
 export function meta({ data }: Route.MetaArgs) {
   if (!data?.page) {
-    return [{ title: `Tentang | ${siteConfig.name}` }];
+    return [
+      { title: `About | ${siteConfig.name}` },
+      { name: "robots", content: "noindex" }
+    ];
   }
 
   const { title, content } = data.page;

@@ -6,7 +6,10 @@ import { requireUser } from "../utils/session.server";
 import { siteConfig } from "~/config";
 
 export function meta() {
-  return [{ title: `Edit Halaman | ${siteConfig.name}` }];
+  return [
+    { title: `Edit Page | ${siteConfig.name}` },
+    { name: "robots", content: "noindex, nofollow" }
+  ];
 }
 
 export async function loader({ params, context, request }: Route.LoaderArgs) {

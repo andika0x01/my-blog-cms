@@ -12,4 +12,6 @@ export default [
   route("pengaturan", "routes/pengaturan.tsx"),
   route("edit-page/:slug", "routes/edit-page.tsx"),
   route("notifikasi", "routes/notifikasi.tsx"),
+  route("sitemap.xml", "routes/sitemap[.]xml.ts"),
+  route("robots.txt", "routes/robots[.]txt.ts"),
 ] satisfies RouteConfig;

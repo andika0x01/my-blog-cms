@@ -74,7 +74,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id">
+    <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />

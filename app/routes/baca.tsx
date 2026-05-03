@@ -12,13 +12,29 @@ import { formatDate } from "../utils/date";
 export function meta({ data }: Route.MetaArgs) {
   if (!data?.post) return [{ title: "Not Found" }];
 
-  const { title, content, slug } = data.post;
+  const { title, content, slug, created_at, id } = data.post;
   const description =
     content
       .replace(/<[^>]*>?/gm, "")
       .substring(0, 160)
       .trim() + "...";
   const postUrl = `${siteConfig.url}/baca/${slug}`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": title,
+    "image": [
+      siteConfig.ogImage
+    ],
+    "datePublished": new Date(created_at).toISOString(),
+    "dateModified": new Date(created_at).toISOString(),
+    "author": [{
+      "@type": "Person",
+      "name": siteConfig.author,
+      "url": siteConfig.links.github
+    }]
+  };
 
   return [
     { title: `${title} | ${siteConfig.name}` },
@@ -28,11 +44,13 @@ export function meta({ data }: Route.MetaArgs) {
     { property: "og:url", content: postUrl },
     { property: "og:type", content: "article" },
     { property: "og:image", content: siteConfig.ogImage },
+    { property: "article:published_time", content: new Date(created_at).toISOString() },
     { property: "article:author", content: siteConfig.author },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
     { name: "twitter:image", content: siteConfig.ogImage },
+    { "script:ld+json": jsonLd }
   ];
 }
 
@@ -207,13 +225,13 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
         </header>
 
         <div className="h-[1px] w-full bg-white/5" />
-        <div className="prose prose-invert prose-neutral max-w-none text-zinc-300 text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: post.content || "" }} />
+        <div className="prose prose-invert prose-neutral max-w-none text-zinc-300 text-base leading-relaxed" dangerouslySetInnerHTML={{ __html: post.content || "" }} />
       </article>
 
       <nav className="flex flex-col md:flex-row justify-between gap-4 mt-8 pt-8 border-t border-white/5">
         {prevPost ? (
           <Link to={`/baca/${prevPost.slug}`} className="group flex flex-col gap-2 w-full md:w-1/2 text-left">
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">← Sebelumnya</span>
+            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">← Previous</span>
             <span className="text-zinc-300 group-hover:text-white font-medium transition-colors">{prevPost.title}</span>
           </Link>
         ) : (
@@ -222,7 +240,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
 
         {nextPost ? (
           <Link to={`/baca/${nextPost.slug}`} className="group flex flex-col gap-2 w-full md:w-1/2 text-left md:text-right">
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Selanjutnya →</span>
+            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Next →</span>
             <span className="text-zinc-300 group-hover:text-white font-medium transition-colors">{nextPost.title}</span>
           </Link>
         ) : (

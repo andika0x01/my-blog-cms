@@ -27,8 +27,8 @@ export function Header({
   ];
 
   const ADMIN_NAV = [
-    { path: "/tulis", label: "Tulis", icon: Plus },
-    { path: "/notifikasi", label: "Notifikasi", icon: Bell },
+    { path: "/tulis", label: "Write", icon: Plus },
+    { path: "/notifikasi", label: "Notifications", icon: Bell },
     { path: "/pengaturan", label: "Settings", icon: GearSix },
   ];
 

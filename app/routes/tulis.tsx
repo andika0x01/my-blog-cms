@@ -6,7 +6,10 @@ import { useState } from "react";
 import { siteConfig } from "~/config";
 
 export function meta() {
-  return [{ title: `Tulis Artikel | ${siteConfig.name}` }];
+  return [
+    { title: `Write | ${siteConfig.name}` },
+    { name: "robots", content: "noindex, nofollow" }
+  ];
 }
 
 export async function loader({ request, context }: Route.LoaderArgs) {

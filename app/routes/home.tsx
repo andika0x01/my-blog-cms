@@ -4,6 +4,18 @@ import { siteConfig } from "../config";
 import { formatDate } from "../utils/date";
 
 export function meta() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": siteConfig.name,
+    "url": siteConfig.url,
+    "description": siteConfig.description,
+    "author": {
+      "@type": "Person",
+      "name": siteConfig.author
+    }
+  };
+
   return [
     { title: siteConfig.title },
     { name: "description", content: siteConfig.description },
@@ -16,6 +28,7 @@ export function meta() {
     { name: "twitter:title", content: siteConfig.title },
     { name: "twitter:description", content: siteConfig.description },
     { name: "twitter:image", content: siteConfig.ogImage },
+    { "script:ld+json": jsonLd }
   ];
 }
 
@@ -36,13 +49,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <div className="flex flex-col gap-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header className="flex flex-col gap-6">
-        <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none text-white">very poor and very stupid</h1>
-        <p className="text-base text-gray-400 leading-relaxed max-w-[65ch]">welcome to my ugly blog!</p>
+        <h1 className="text-4xl md:text-5xl font-medium tracking-tighter leading-none text-white">{siteConfig.name}</h1>
+        <p className="text-base text-gray-400 leading-relaxed max-w-[65ch]">{siteConfig.description}</p>
       </header>
 
       <section className="flex flex-col gap-8">
         {posts.length === 0 ? (
-          <p className="text-gray-500 italic">Belum ada tulisan.</p>
+          <p className="text-gray-500 italic">No posts published yet.</p>
         ) : (
           posts.map((post: any) => (
             <Link key={post.id} to={`/baca/${post.slug}`} className="group flex flex-col gap-2 relative py-4">

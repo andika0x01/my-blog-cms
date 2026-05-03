@@ -6,7 +6,10 @@ import { requireUser } from "../utils/session.server";
 import { siteConfig } from "~/config";
 
 export function meta() {
-  return [{ title: `Edit Artikel | ${siteConfig.name}` }];
+  return [
+    { title: `Edit Post | ${siteConfig.name}` },
+    { name: "robots", content: "noindex, nofollow" }
+  ];
 }
 
 type Post = {

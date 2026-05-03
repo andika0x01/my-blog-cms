@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "Andika Dinata",
   title: "Andika Dinata - Software Engineer",
-  description: "very poor and very stupid.",
+  description: "Software Engineer sharing thoughts on code, design, and technology.",
   url: "https://andikadinata.tech",
   ogImage: "https://andikadinata.tech/og-image.png",
   links: {
@@ -10,5 +10,5 @@ export const siteConfig = {
   },
   author: "Andika Dinata",
   twitterHandle: "@andika0x01",
-  locale: "id_ID",
+  locale: "en_US",
 };

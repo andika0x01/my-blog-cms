@@ -5,7 +5,10 @@ import bcrypt from "bcryptjs";
 import { siteConfig } from "~/config";
 
 export function meta() {
-  return [{ title: `Pengaturan | ${siteConfig.name}` }];
+  return [
+    { title: `Settings | ${siteConfig.name}` },
+    { name: "robots", content: "noindex, nofollow" }
+  ];
 }
 
 export async function loader({ request, context }: Route.LoaderArgs) {
