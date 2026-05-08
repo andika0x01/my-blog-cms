@@ -5,11 +5,15 @@ import { siteConfig } from "../config";
 import { formatDate } from "../utils/date";
 import { getPosts } from "../services/post.server";
 
-export function meta() {
-  const title = `Blog | ${siteConfig.name}`;
+export function meta({ location }: Route.MetaArgs) {
+  const url = new URL(location.pathname + location.search, siteConfig.url);
+  const page = Number(url.searchParams.get("page")) || 1;
+  const q = url.searchParams.get("q");
+
+  const title = page > 1 ? `Blog - Halaman ${page} | ${siteConfig.name}` : `Blog | ${siteConfig.name}`;
   const description = `Read the latest articles and thoughts from ${siteConfig.author}.`;
 
-  return [
+  const metaTags = [
     { title },
     { name: "description", content: description },
     { property: "og:title", content: title },
@@ -21,7 +25,14 @@ export function meta() {
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
     { name: "twitter:image", content: siteConfig.ogImage },
+    { tagName: "link", rel: "canonical", href: `${siteConfig.url}/blog` },
   ];
+
+  if (q) {
+    metaTags.push({ name: "robots", content: "noindex, follow" });
+  }
+
+  return metaTags;
 }
 
 export async function loader({ context, request }: Route.LoaderArgs) {
@@ -67,7 +78,7 @@ export default function Blog({ loaderData }: Route.ComponentProps) {
           <p className="text-gray-500 italic py-4">{search ? `No posts matched with "${search}".` : "No posts published yet."}</p>
         ) : (
           posts.map((post: any) => (
-            <Link key={post.id} to={`/baca/${post.slug}`} className="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors px-2 -mx-2 rounded-sm">
+            <Link key={post.id} to={`/post/${post.slug}`} className="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors px-2 -mx-2 rounded-sm">
               <div className="flex items-center gap-3">
                 <h2 className="text-lg font-medium text-black group-hover:underline decoration-gray-300 underline-offset-4">{post.title}</h2>
                 {post.is_draft === 1 && (

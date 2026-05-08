@@ -25,7 +25,6 @@ export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" },
   { rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" },
   { rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" },
-  { rel: "canonical", href: siteConfig.url },
 ];
 
 export async function loader({ request, context }: Route.LoaderArgs) {

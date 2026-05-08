@@ -40,8 +40,8 @@ export default function Login({ actionData }: Route.ComponentProps) {
     <div className="flex flex-col items-center justify-center min-h-[60vh] animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="w-full max-w-sm space-y-8">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-medium tracking-tight text-white">Login.</h1>
-          <p className="text-gray-400">Sign in to manage posts.</p>
+          <h1 className="text-3xl font-medium tracking-tight text-black">Login.</h1>
+          <p className="text-gray-500">Sign in to manage posts.</p>
         </div>
 
         <Form method="post" className="space-y-4">
@@ -51,23 +51,23 @@ export default function Login({ actionData }: Route.ComponentProps) {
               name="username"
               placeholder="Username"
               required
-              className="w-full bg-transparent border-b border-white/10 px-0 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-white transition-colors"
+              className="w-full bg-transparent border-b border-black/10 px-0 py-3 text-black placeholder:text-gray-400 focus:outline-none focus:border-black transition-colors"
             />
             <input
               type="password"
               name="password"
               placeholder="Password"
               required
-              className="w-full bg-transparent border-b border-white/10 px-0 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-white transition-colors"
+              className="w-full bg-transparent border-b border-black/10 px-0 py-3 text-black placeholder:text-gray-400 focus:outline-none focus:border-black transition-colors"
             />
           </div>
 
-          {actionData?.error && <p className="text-red-400 text-sm">{actionData.error}</p>}
+          {actionData?.error && <p className="text-red-500 text-sm">{actionData.error}</p>}
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-white text-black py-3 rounded-full font-medium mt-4 hover:scale-[0.98] active:scale-95 transition-transform disabled:opacity-50"
+            className="w-full bg-black text-white py-3 rounded-full font-medium mt-4 hover:scale-[0.98] active:scale-95 transition-transform disabled:opacity-50"
           >
             {isSubmitting ? "Processing..." : "Sign In"}
           </button>

@@ -28,7 +28,7 @@ export async function action({ request, context, params }: Route.ActionArgs) {
   const db = context.cloudflare.env.DB;
 
   await db.prepare("UPDATE pages SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE slug = ?").bind(title, content, params.slug).run();
-  return redirect(params.slug === "about" ? "/tentang" : "/");
+  return redirect(params.slug === "about" ? "/about" : "/");
 }
 
 export default function EditPage({ loaderData }: Route.ComponentProps) {
@@ -43,11 +43,11 @@ export default function EditPage({ loaderData }: Route.ComponentProps) {
           type="text"
           name="title"
           defaultValue={page.title}
-          className="w-full min-w-0 flex-1 text-4xl md:text-5xl font-medium tracking-tighter bg-transparent border-none outline-none text-white focus:ring-0"
+          className="w-full min-w-0 flex-1 text-4xl md:text-5xl font-medium tracking-tighter bg-transparent border-none outline-none text-black focus:ring-0"
         />
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto shrink-0">
-          <button type="submit" className="bg-white text-black px-6 py-2 rounded-full font-medium text-sm transition-transform hover:scale-105 active:scale-95 disabled:opacity-50">
+          <button type="submit" className="bg-black text-white px-6 py-2 rounded-full font-medium text-sm transition-transform hover:scale-105 active:scale-95 disabled:opacity-50">
             {navigation.state === "submitting" ? "Menyimpan..." : "Update Halaman"}
           </button>
         </div>

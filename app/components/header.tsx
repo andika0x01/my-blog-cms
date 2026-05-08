@@ -23,13 +23,13 @@ export function Header({
   const PUBLIC_NAV = [
     { path: "/", label: "Home", icon: House },
     { path: "/blog", label: "Blog", icon: PenNib },
-    { path: "/tentang", label: "About", icon: User },
+    { path: "/about", label: "About", icon: User },
   ];
 
   const ADMIN_NAV = [
-    { path: "/tulis", label: "Write", icon: Plus },
-    { path: "/notifikasi", label: "Notifications", icon: Bell },
-    { path: "/pengaturan", label: "Settings", icon: GearSix },
+    { path: "/write", label: "Write", icon: Plus },
+    { path: "/notifications", label: "Notifications", icon: Bell },
+    { path: "/settings", label: "Settings", icon: GearSix },
   ];
 
   return (
@@ -84,7 +84,7 @@ export function Header({
 
         {!isLoggedIn && (
           <div className="flex items-center gap-1 md:gap-3">
-            <Link to="/notifikasi" className="p-2 md:p-2.5 text-gray-500 hover:text-black border border-gray-200 rounded-full transition-colors relative bg-white" title="Notifikasi Anda">
+            <Link to="/notifications" className="p-2 md:p-2.5 text-gray-500 hover:text-black border border-gray-200 rounded-full transition-colors relative bg-white" title="Notifications">
               <Bell className="w-4 h-4" />
               {visitorUnreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white">
@@ -102,7 +102,7 @@ export function Header({
           <div className="hidden md:flex items-center gap-1 bg-white border border-gray-200 rounded-full p-1">
             {ADMIN_NAV.map((item) => {
               const AdminIcon = item.icon;
-              const hasNotification = item.path === "/notifikasi" && adminUnreadCount > 0;
+              const hasNotification = item.path === "/notifications" && adminUnreadCount > 0;
               return (
                 <Link
                   key={item.path}

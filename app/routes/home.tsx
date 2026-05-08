@@ -23,6 +23,7 @@ export function meta() {
     { property: "og:title", content: siteConfig.title },
     { property: "og:description", content: siteConfig.description },
     { property: "og:url", content: siteConfig.url },
+    { tagName: "link", rel: "canonical", href: siteConfig.url },
     { property: "og:type", content: "website" },
     { property: "og:image", content: siteConfig.ogImage },
     { name: "twitter:card", content: "summary_large_image" },
@@ -59,7 +60,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           <p className="text-gray-500 italic py-4">No posts published yet.</p>
         ) : (
           posts.map((post: any) => (
-            <Link key={post.id} to={`/baca/${post.slug}`} className="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors px-2 -mx-2 rounded-sm">
+            <Link key={post.id} to={`/post/${post.slug}`} className="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors px-2 -mx-2 rounded-sm">
               <h2 className="text-lg font-medium text-black">{post.title}</h2>
               <time className="text-sm text-gray-500 shrink-0">{formatDate(post.created_at)}</time>
             </Link>

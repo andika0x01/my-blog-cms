@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "Andika Dinata",
-  title: "Andika Dinata - Software Engineer",
-  description: "Software Engineer sharing thoughts on code, design, and technology.",
+  title: "Andika Dinata",
+  description: "Very Poor and Very Stupid.",
   url: "https://andikadinata.tech",
   ogImage: "https://andikadinata.tech/og-image.png",
   links: {

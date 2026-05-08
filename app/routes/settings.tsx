@@ -1,4 +1,4 @@
-import type { Route } from "./+types/pengaturan";
+import type { Route } from "./+types/settings";
 import { Form, useNavigation } from "react-router";
 import { requireUser } from "../utils/session.server";
 import bcrypt from "bcryptjs";
@@ -33,15 +33,15 @@ export async function action({ request, context }: Route.ActionArgs) {
   }
 }
 
-export default function Pengaturan({ actionData }: Route.ComponentProps) {
+export default function Settings({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
   return (
     <div className="flex flex-col gap-10 max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="space-y-2">
-        <h1 className="text-4xl font-medium tracking-tighter text-white">Settings.</h1>
-        <p className="text-gray-400">Update your login credentials.</p>
+        <h1 className="text-4xl font-medium tracking-tighter text-black">Settings.</h1>
+        <p className="text-gray-500">Update your login credentials.</p>
       </div>
 
       <Form method="post" className="space-y-4">
@@ -51,24 +51,24 @@ export default function Pengaturan({ actionData }: Route.ComponentProps) {
             name="username"
             placeholder="New Username"
             required
-            className="w-full bg-transparent border-b border-white/10 px-0 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-white transition-colors"
+            className="w-full bg-transparent border-b border-black/10 px-0 py-3 text-black placeholder:text-gray-400 focus:outline-none focus:border-black transition-colors"
           />
           <input
             type="password"
             name="password"
             placeholder="New Password"
             required
-            className="w-full bg-transparent border-b border-white/10 px-0 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-white transition-colors"
+            className="w-full bg-transparent border-b border-black/10 px-0 py-3 text-black placeholder:text-gray-400 focus:outline-none focus:border-black transition-colors"
           />
         </div>
 
-        {actionData?.error && <p className="text-red-400 text-sm">{actionData.error}</p>}
-        {actionData?.success && <p className="text-green-400 text-sm">{actionData.success}</p>}
+        {actionData?.error && <p className="text-red-500 text-sm">{actionData.error}</p>}
+        {actionData?.success && <p className="text-green-600 text-sm">{actionData.success}</p>}
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-white text-black py-3 rounded-full font-medium mt-4 hover:scale-[0.98] active:scale-95 transition-transform disabled:opacity-50"
+          className="w-full bg-black text-white py-3 rounded-full font-medium mt-4 hover:scale-[0.98] active:scale-95 transition-transform disabled:opacity-50"
         >
           {isSubmitting ? "Saving..." : "Save Changes"}
         </button>

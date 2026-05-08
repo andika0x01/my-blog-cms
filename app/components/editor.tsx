@@ -42,7 +42,7 @@ export function Editor({ onChange, initialContent = "" }: { onChange?: (html: st
         openOnClick: false,
         autolink: true,
         HTMLAttributes: {
-          class: "text-white underline decoration-white/30 underline-offset-4 cursor-pointer hover:decoration-white transition-colors",
+          class: "text-black underline decoration-black/30 underline-offset-4 cursor-pointer hover:decoration-black transition-colors",
         },
       }),
       Youtube.configure({

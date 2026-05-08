@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { PencilSimple } from "@phosphor-icons/react";
 import { getAuthSession } from "../utils/session.server";
-import type { Route } from "./+types/tentang";
+import type { Route } from "./+types/about";
 import { siteConfig } from "../config";
 
 export function meta({ data }: Route.MetaArgs) {
@@ -26,7 +26,7 @@ export function meta({ data }: Route.MetaArgs) {
     { name: "description", content: description },
     { property: "og:title", content: `${title} | ${siteConfig.name}` },
     { property: "og:description", content: description },
-    { property: "og:url", content: `${siteConfig.url}/tentang` },
+    { property: "og:url", content: `${siteConfig.url}/about` },
     { property: "og:type", content: "profile" },
     { property: "og:image", content: siteConfig.ogImage },
     { name: "twitter:card", content: "summary_large_image" },
@@ -46,7 +46,7 @@ export async function loader({ context, request }: Route.LoaderArgs) {
   return { page, isLoggedIn };
 }
 
-export default function Tentang({ loaderData }: Route.ComponentProps) {
+export default function About({ loaderData }: Route.ComponentProps) {
   const { page, isLoggedIn } = loaderData;
 
   return (

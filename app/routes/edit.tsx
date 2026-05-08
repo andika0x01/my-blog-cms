@@ -42,7 +42,7 @@ export async function action({ request, context, params }: Route.ActionArgs) {
   const isDraft = intent === "draft" ? 1 : 0;
 
   await db.prepare("UPDATE posts SET title = ?, content = ?, is_draft = ? WHERE slug = ?").bind(title, content, isDraft, params.slug).run();
-  return redirect(`/baca/${params.slug}`);
+  return redirect(`/post/${params.slug}`);
 }
 
 export default function Edit({ loaderData }: Route.ComponentProps) {
@@ -58,7 +58,7 @@ export default function Edit({ loaderData }: Route.ComponentProps) {
           type="text"
           name="title"
           defaultValue={post.title}
-          className="w-full min-w-0 flex-1 text-4xl md:text-5xl font-medium tracking-tighter bg-transparent border-none outline-none text-white focus:ring-0"
+          className="w-full min-w-0 flex-1 text-4xl md:text-5xl font-medium tracking-tighter bg-transparent border-none outline-none text-black focus:ring-0"
         />
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -68,7 +68,7 @@ export default function Edit({ loaderData }: Route.ComponentProps) {
             value="draft"
             disabled={isSubmitting}
             className={`px-6 py-2 rounded-full font-medium text-sm border transition-all disabled:opacity-50 ${
-              post.is_draft === 1 ? "bg-white/5 border-white/20 text-white" : "border-white/10 text-gray-400 hover:text-white"
+              post.is_draft === 1 ? "bg-black/5 border-black/20 text-black" : "border-black/10 text-gray-500 hover:text-black hover:bg-black/5"
             }`}
           >
             {isSubmitting ? "..." : post.is_draft === 1 ? "Save Draft" : "Revert to Draft"}
@@ -79,7 +79,7 @@ export default function Edit({ loaderData }: Route.ComponentProps) {
             name="intent"
             value="publish"
             disabled={isSubmitting}
-            className="bg-white text-black px-6 py-2 rounded-full font-medium text-sm transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
+            className="bg-black text-white px-6 py-2 rounded-full font-medium text-sm transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
           >
             {isSubmitting ? "Menyimpan..." : post.is_draft === 1 ? "Publish Sekarang" : "Update"}
           </button>

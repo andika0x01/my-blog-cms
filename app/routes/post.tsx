@@ -3,7 +3,7 @@ import { useRef, useEffect } from "react";
 import { Trash, PencilSimple, Heart, ChatCircle, ArrowLeft, PaperPlaneTilt, ArrowUDownLeft, X } from "@phosphor-icons/react";
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Route } from "./+types/baca";
+import type { Route } from "./+types/post";
 import { getAuthSession, getVisitorStorage } from "../utils/session.server";
 import { siteConfig } from "../config";
 import { cn } from "../utils/cn";
@@ -20,7 +20,7 @@ export function meta({ data }: Route.MetaArgs) {
       .replace(/<[^>]*>?/gm, "")
       .substring(0, 160)
       .trim() + "...";
-  const postUrl = `${siteConfig.url}/baca/${slug}`;
+  const postUrl = `${siteConfig.url}/post/${slug}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -48,6 +48,7 @@ export function meta({ data }: Route.MetaArgs) {
     { property: "og:image", content: siteConfig.ogImage },
     { property: "article:published_time", content: new Date(created_at).toISOString() },
     { property: "article:author", content: siteConfig.author },
+    { tagName: "link", rel: "canonical", href: postUrl },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
@@ -152,7 +153,7 @@ export async function action({ request, context, params }: Route.ActionArgs) {
   return null;
 }
 
-export default function Baca({ loaderData }: Route.ComponentProps) {
+export default function Post({ loaderData }: Route.ComponentProps) {
   const { post, isLoggedIn, likes, comments, visitorName, visitorHasLiked, adminUsername, prevPost, nextPost } = loaderData;
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
 
@@ -219,7 +220,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
 
       <nav className="flex flex-col md:flex-row justify-between gap-4 mt-8 pt-8 border-t border-gray-200 font-mono">
         {prevPost ? (
-          <Link to={`/baca/${prevPost.slug}`} className="group flex flex-col gap-2 w-full md:w-1/2 text-left">
+          <Link to={`/post/${prevPost.slug}`} className="group flex flex-col gap-2 w-full md:w-1/2 text-left">
             <span className="text-[10px] text-gray-500 uppercase tracking-widest">← Previous</span>
             <span className="text-gray-800 group-hover:text-black font-medium transition-colors hover:underline decoration-gray-300 underline-offset-4">{prevPost.title}</span>
           </Link>
@@ -228,7 +229,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
         )}
 
         {nextPost ? (
-          <Link to={`/baca/${nextPost.slug}`} className="group flex flex-col gap-2 w-full md:w-1/2 text-left md:text-right">
+          <Link to={`/post/${nextPost.slug}`} className="group flex flex-col gap-2 w-full md:w-1/2 text-left md:text-right">
             <span className="text-[10px] text-gray-500 uppercase tracking-widest">Next →</span>
             <span className="text-gray-800 group-hover:text-black font-medium transition-colors hover:underline decoration-gray-300 underline-offset-4">{nextPost.title}</span>
           </Link>

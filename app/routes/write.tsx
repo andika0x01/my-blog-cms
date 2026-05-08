@@ -1,5 +1,5 @@
 import { requireUser } from "../utils/session.server";
-import type { Route } from "./+types/tulis";
+import type { Route } from "./+types/write";
 import { Editor } from "../components/editor";
 import { Form, redirect, useNavigation } from "react-router";
 import { useState } from "react";
@@ -45,7 +45,7 @@ export async function action({ request, context }: Route.ActionArgs) {
   return redirect(isDraft ? "/blog" : "/");
 }
 
-export default function Tulis({ actionData }: Route.ComponentProps) {
+export default function Write({ actionData }: Route.ComponentProps) {
   const [content, setContent] = useState("");
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
@@ -58,7 +58,7 @@ export default function Tulis({ actionData }: Route.ComponentProps) {
           name="title"
           placeholder="Post title..."
           required
-          className="w-full min-w-0 flex-1 text-4xl md:text-5xl font-medium tracking-tighter bg-transparent border-none outline-none text-white placeholder:text-gray-600 focus:ring-0"
+          className="w-full min-w-0 flex-1 text-4xl md:text-5xl font-medium tracking-tighter bg-transparent border-none outline-none text-black placeholder:text-gray-400 focus:ring-0"
         />
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -67,7 +67,7 @@ export default function Tulis({ actionData }: Route.ComponentProps) {
             name="intent"
             value="draft"
             disabled={isSubmitting}
-            className="px-6 py-2 rounded-full font-medium text-sm border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-all disabled:opacity-50"
+            className="px-6 py-2 rounded-full font-medium text-sm border border-black/10 text-gray-500 hover:text-black hover:bg-black/5 transition-all disabled:opacity-50"
           >
             {isSubmitting ? "..." : "Save Draft"}
           </button>
@@ -77,16 +77,16 @@ export default function Tulis({ actionData }: Route.ComponentProps) {
             name="intent"
             value="publish"
             disabled={isSubmitting}
-            className="bg-white text-black px-6 py-2 rounded-full font-medium text-sm transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+            className="bg-black text-white px-6 py-2 rounded-full font-medium text-sm transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
           >
             {isSubmitting ? "Menyimpan..." : "Publish"}
           </button>
         </div>
       </div>
 
-      {actionData?.error && <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm">{actionData.error}</div>}
+      {actionData?.error && <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 text-sm">{actionData.error}</div>}
 
-      <div className="h-[1px] w-full bg-white/10" />
+      <div className="h-[1px] w-full bg-black/10" />
       <input type="hidden" name="content" value={content} />
       <Editor onChange={(html) => setContent(html)} />
     </Form>
