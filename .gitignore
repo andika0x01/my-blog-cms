@@ -17,3 +17,4 @@ worker-configuration.d.ts
 !.dev.vars.example
 !.env.example
 repomix-output.md
+coverage/

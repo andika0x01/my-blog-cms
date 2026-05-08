@@ -3,6 +3,7 @@ import type { Route } from "./+types/blog";
 import { getAuthSession } from "../utils/session.server";
 import { siteConfig } from "../config";
 import { formatDate } from "../utils/date";
+import { getPosts } from "../services/post.server";
 
 export function meta() {
   const title = `Blog | ${siteConfig.name}`;
@@ -31,40 +32,9 @@ export async function loader({ context, request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get("page") || "1", 10);
   const search = url.searchParams.get("q") || "";
-  const limit = 10;
-  const offset = (page - 1) * limit;
-
-  let baseQuery = isLoggedIn ? "FROM posts WHERE 1=1" : "FROM posts WHERE is_draft = 0";
-
-  const params: (string | number)[] = [];
-
-  if (search) {
-    baseQuery += " AND (title LIKE ? OR content LIKE ?)";
-    params.push(`%${search}%`, `%${search}%`);
-  }
-
-  const countResult = await db
-    .prepare(`SELECT COUNT(*) as total ${baseQuery}`)
-    .bind(...params)
-    .first<{ total: number }>();
-  const totalPosts = countResult?.total || 0;
-  const totalPages = Math.ceil(totalPosts / limit);
-
-  const postsQuery = `SELECT id, title, slug, created_at, is_draft ${baseQuery} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
-  const postsParams = [...params, limit, offset];
-
-  const { results } = await db
-    .prepare(postsQuery)
-    .bind(...postsParams)
-    .all();
-
-  return {
-    posts: results as any[],
-    isLoggedIn,
-    page,
-    totalPages,
-    search,
-  };
+  
+  const postData = await getPosts(db, isLoggedIn, page, search);
+  return { ...postData, isLoggedIn };
 }
 
 export default function Blog({ loaderData }: Route.ComponentProps) {
@@ -73,77 +43,70 @@ export default function Blog({ loaderData }: Route.ComponentProps) {
   const searchParam = search ? `&q=${encodeURIComponent(search)}` : "";
 
   return (
-    <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-4 duration-700 mt-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <h1 className="text-4xl font-medium tracking-tighter text-white">All Posts.</h1>
+        <h1 className="text-4xl font-semibold tracking-tight text-black">All Posts.</h1>
         <Form method="get" className="relative w-full md:w-64" onChange={(e) => submit(e.currentTarget)}>
           <input
             type="text"
             name="q"
             defaultValue={search}
             placeholder="Search posts..."
-            className="w-full bg-white/5 border border-white/10 rounded-full px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-white/30 transition-colors"
+            className="w-full bg-white border border-gray-200 rounded-sm px-4 py-2.5 text-sm text-black placeholder:text-gray-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
           />
           {search && (
-            <Link to="/blog" className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white">
+            <Link to="/blog" className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black">
               ✕
             </Link>
           )}
         </Form>
       </div>
 
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-0 border-t border-gray-200">
         {posts.length === 0 ? (
-          <p className="text-gray-500 italic">{search ? `No posts matched with "${search}".` : "No posts published yet."}</p>
+          <p className="text-gray-500 italic py-4">{search ? `No posts matched with "${search}".` : "No posts published yet."}</p>
         ) : (
           posts.map((post: any) => (
-            <Link key={post.id} to={`/baca/${post.slug}`} className="group flex flex-col gap-2 relative py-4">
+            <Link key={post.id} to={`/baca/${post.slug}`} className="group flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors px-2 -mx-2 rounded-sm">
               <div className="flex items-center gap-3">
-                <h2 className="text-xl md:text-2xl font-medium text-gray-200 group-hover:text-white transition-colors">{post.title}</h2>
-
-                {isLoggedIn && post.is_draft === 1 && (
-                  <span className="text-[10px] bg-white/10 text-gray-400 px-2 py-0.5 rounded-full uppercase tracking-widest font-bold border border-white/5">Draft</span>
+                <h2 className="text-lg font-medium text-black group-hover:underline decoration-gray-300 underline-offset-4">{post.title}</h2>
+                {post.is_draft === 1 && (
+                  <span className="px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-sm bg-gray-100 text-gray-500 border border-gray-200">
+                    Draft
+                  </span>
                 )}
               </div>
-
-              <time className="text-sm text-gray-500 font-mono">{formatDate(post.created_at)}</time>
-
-              <div className="absolute bottom-0 left-0 h-[1px] w-full bg-white/5">
-                <div className="h-full bg-white/20 w-0 group-hover:w-full transition-all duration-500 ease-out" />
-              </div>
+              <time className="text-sm text-gray-500 shrink-0">{formatDate(post.created_at)}</time>
             </Link>
           ))
         )}
       </div>
+
       {totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-white/5">
-          <div className="text-sm font-mono text-gray-500">
+        <div className="flex items-center justify-between border-t border-gray-200 pt-6">
+          {page > 1 ? (
+            <Link
+              to={`/blog?page=${page - 1}${searchParam}`}
+              className="px-4 py-2 border border-gray-200 rounded-sm hover:bg-gray-50 hover:text-black text-gray-600 transition-colors text-sm font-medium"
+            >
+              ← Previous
+            </Link>
+          ) : (
+            <div />
+          )}
+
+          <span className="text-gray-500 text-sm">
             Page {page} of {totalPages}
-          </div>
+          </span>
 
-          <div className="flex items-center gap-2">
-            {page > 1 ? (
-              <Link
-                to={`/blog?page=${page - 1}${searchParam}`}
-                className="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all"
-              >
-                Previous
-              </Link>
-            ) : (
-              <span className="px-5 py-2 bg-transparent text-gray-600 text-sm cursor-not-allowed">Previous</span>
-            )}
-
-            {page < totalPages ? (
-              <Link
-                to={`/blog?page=${page + 1}${searchParam}`}
-                className="px-5 py-2 bg-white text-black rounded-full text-sm font-medium hover:scale-105 active:scale-95 transition-all"
-              >
-                Next
-              </Link>
-            ) : (
-              <span className="px-5 py-2 bg-transparent text-gray-600 text-sm cursor-not-allowed">Next</span>
-            )}
-          </div>
+          {page < totalPages && (
+            <Link
+              to={`/blog?page=${page + 1}${searchParam}`}
+              className="px-4 py-2 border border-gray-200 rounded-sm hover:bg-gray-50 hover:text-black text-gray-600 transition-colors text-sm font-medium"
+            >
+              Next →
+            </Link>
+          )}
         </div>
       )}
     </div>

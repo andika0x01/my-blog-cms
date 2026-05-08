@@ -64,7 +64,7 @@ export function Editor({ onChange, initialContent = "" }: { onChange?: (html: st
     },
     editorProps: {
       attributes: {
-        class: "prose prose-invert prose-neutral max-w-none focus:outline-none min-h-[50vh]",
+        class: "prose prose-neutral max-w-none focus:outline-none min-h-[50vh] font-sans",
       },
     },
   });

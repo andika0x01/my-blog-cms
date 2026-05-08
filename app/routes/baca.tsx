@@ -8,6 +8,8 @@ import { getAuthSession, getVisitorStorage } from "../utils/session.server";
 import { siteConfig } from "../config";
 import { cn } from "../utils/cn";
 import { formatDate } from "../utils/date";
+import { getPostBySlug, getPostNavigation, deletePost } from "../services/post.server";
+import { getCommentsAndLikes, addLike, addComment, deleteComment } from "../services/comment.server";
 
 export function meta({ data }: Route.MetaArgs) {
   if (!data?.post) return [{ title: "Not Found" }];
@@ -80,33 +82,20 @@ export async function loader({ params, context, request }: Route.LoaderArgs) {
     adminUsername = user?.username;
   }
 
-  const post = await db.prepare("SELECT id, title, content, created_at, slug, is_draft FROM posts WHERE slug = ?").bind(params.slug).first<Post>();
+  const post = await getPostBySlug(db, params.slug, isLoggedIn);
 
-  if (!post) throw data("Post not found", { status: 404 });
-
-  if (post.is_draft === 1 && !isLoggedIn) {
-    throw data("Sorry, this post hasn't been published yet.", { status: 404 });
+  if (!post) {
+    throw data("Post not found or hasn't been published yet.", { status: 404 });
   }
 
-  const prevPost = await db
-    .prepare("SELECT slug, title FROM posts WHERE created_at < ? AND is_draft = 0 ORDER BY created_at DESC LIMIT 1")
-    .bind(post.created_at)
-    .first<{ slug: string; title: string }>();
-
-  const nextPost = await db
-    .prepare("SELECT slug, title FROM posts WHERE created_at > ? AND is_draft = 0 ORDER BY created_at ASC LIMIT 1")
-    .bind(post.created_at)
-    .first<{ slug: string; title: string }>();
-
-  const likesCount = await db.prepare("SELECT COUNT(*) as total FROM likes WHERE post_id = ?").bind(post.id).first<any>();
-
-  const commentsData = await db.prepare("SELECT id, name, content, created_at, parent_id FROM comments WHERE post_id = ? ORDER BY created_at ASC").bind(post.id).all();
+  const { prevPost, nextPost } = await getPostNavigation(db, post.created_at);
+  const { likes, comments } = await getCommentsAndLikes(db, post.id);
 
   return {
     post,
     isLoggedIn,
-    likes: likesCount?.total || 0,
-    comments: commentsData.results,
+    likes,
+    comments,
     visitorName,
     visitorHasLiked,
     adminUsername,
@@ -127,22 +116,22 @@ export async function action({ request, context, params }: Route.ActionArgs) {
 
   if (intent === "delete") {
     if (!userId) return data("Unauthorized", { status: 401 });
-    await db.prepare("DELETE FROM posts WHERE slug = ?").bind(params.slug).run();
+    await deletePost(db, params.slug as string);
     return redirect("/blog");
   }
 
-  const post_id = formData.get("post_id");
+  const post_id = Number(formData.get("post_id"));
 
   if (intent === "like") {
     if (userId || visitorSession.get(`liked_${params.slug}`)) return null;
 
-    await db.prepare("INSERT INTO likes (post_id, visitor_id) VALUES (?, ?)").bind(post_id, "anon").run();
+    await addLike(db, post_id);
     visitorSession.set(`liked_${params.slug}`, true);
     return data({ success: true }, { headers: { "Set-Cookie": await visitorStorage.commitSession(visitorSession) } });
   }
 
   if (intent === "comment") {
-    const parent_id = formData.get("parent_id") || null;
+    const parent_id = formData.get("parent_id") ? Number(formData.get("parent_id")) : null;
     const content = formData.get("content") as string;
     let name = visitorSession.get("name") || (formData.get("name") as string);
 
@@ -153,7 +142,7 @@ export async function action({ request, context, params }: Route.ActionArgs) {
 
     if (!name || !content) return { error: "Konten tidak boleh kosong." };
 
-    await db.prepare("INSERT INTO comments (post_id, name, content, parent_id, is_read) VALUES (?, ?, ?, ?, 0)").bind(post_id, name, content, parent_id).run();
+    await addComment(db, post_id, name, content, parent_id);
 
     if (!userId) visitorSession.set("name", name);
 
@@ -185,28 +174,28 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
   }, [comments]);
 
   return (
-    <div key={post.slug} className="flex flex-col gap-12 animate-in fade-in duration-700">
-      <Link to="/blog" className="group flex items-center gap-2 text-sm text-zinc-500 hover:text-white transition-colors w-fit font-mono">
+    <div key={post.slug} className="flex flex-col gap-12 animate-in fade-in duration-700 mt-10">
+      <Link to="/blog" className="group flex items-center gap-2 text-sm text-gray-500 hover:text-black transition-colors w-fit font-mono">
         <ArrowLeft className="group-hover:-translate-x-1 transition-transform" /> /root/blog
       </Link>
 
       <article className="flex flex-col gap-8">
-        <header className="flex flex-col gap-6">
+        <header className="flex flex-col gap-6 font-mono">
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-4xl md:text-6xl font-medium tracking-tighter leading-none text-white">{post.title}</h1>
+              <h1 className="text-4xl md:text-5xl font-semibold tracking-tight leading-none text-black my-2">{post.title}</h1>
               {post.is_draft === 1 && (
-                <span className="text-xs bg-white/10 text-zinc-400 px-3 py-1 rounded-full uppercase tracking-widest font-bold border border-white/5">Draft</span>
+                <span className="text-xs bg-gray-100 text-gray-500 px-3 py-1 rounded-sm uppercase tracking-widest font-bold border border-gray-200">Draft</span>
               )}
             </div>
-            <time className="text-sm text-zinc-500 font-mono italic">{formatDate(post.created_at, "dddd, DD MMMM YYYY")}</time>
+            <time className="text-sm text-gray-500">[{formatDate(post.created_at, "dddd, DD MMMM YYYY")}]</time>
           </div>
 
           {isLoggedIn && (
             <div className="flex gap-2">
               <Link
                 to={`/edit/${post.slug}`}
-                className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-zinc-300 hover:text-white transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-sm text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-all font-sans"
               >
                 <PencilSimple size={16} /> Edit
               </Link>
@@ -215,7 +204,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
                   type="submit"
                   name="intent"
                   value="delete"
-                  className="flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full text-sm text-red-400 hover:bg-red-500/20 transition-all"
+                  className="flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-200 rounded-sm text-sm text-red-600 hover:bg-red-100 transition-all font-sans"
                 >
                   <Trash size={16} /> Delete
                 </button>
@@ -224,15 +213,15 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
           )}
         </header>
 
-        <div className="h-[1px] w-full bg-white/5" />
-        <div className="prose prose-invert prose-neutral max-w-none text-zinc-300 text-base leading-relaxed" dangerouslySetInnerHTML={{ __html: post.content || "" }} />
+        <div className="h-[1px] w-full bg-gray-200" />
+        <div className="prose prose-neutral max-w-none text-gray-800 text-base leading-relaxed font-sans" dangerouslySetInnerHTML={{ __html: post.content || "" }} />
       </article>
 
-      <nav className="flex flex-col md:flex-row justify-between gap-4 mt-8 pt-8 border-t border-white/5">
+      <nav className="flex flex-col md:flex-row justify-between gap-4 mt-8 pt-8 border-t border-gray-200 font-mono">
         {prevPost ? (
           <Link to={`/baca/${prevPost.slug}`} className="group flex flex-col gap-2 w-full md:w-1/2 text-left">
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">← Previous</span>
-            <span className="text-zinc-300 group-hover:text-white font-medium transition-colors">{prevPost.title}</span>
+            <span className="text-[10px] text-gray-500 uppercase tracking-widest">← Previous</span>
+            <span className="text-gray-800 group-hover:text-black font-medium transition-colors hover:underline decoration-gray-300 underline-offset-4">{prevPost.title}</span>
           </Link>
         ) : (
           <div className="w-full md:w-1/2" />
@@ -240,17 +229,17 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
 
         {nextPost ? (
           <Link to={`/baca/${nextPost.slug}`} className="group flex flex-col gap-2 w-full md:w-1/2 text-left md:text-right">
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Next →</span>
-            <span className="text-zinc-300 group-hover:text-white font-medium transition-colors">{nextPost.title}</span>
+            <span className="text-[10px] text-gray-500 uppercase tracking-widest">Next →</span>
+            <span className="text-gray-800 group-hover:text-black font-medium transition-colors hover:underline decoration-gray-300 underline-offset-4">{nextPost.title}</span>
           </Link>
         ) : (
           <div className="w-full md:w-1/2" />
         )}
       </nav>
 
-      <section className="flex flex-col gap-10 mt-12">
-        <div className="flex items-center justify-between pt-8 border-t border-white/5">
-          <div className="flex items-center gap-2 text-zinc-500">
+      <section className="flex flex-col gap-10 mt-12 font-sans">
+        <div className="flex items-center justify-between pt-8 border-t border-gray-200">
+          <div className="flex items-center gap-2 text-gray-500">
             <ChatCircle size={22} weight="duotone" />
             <span className="font-mono text-xs tracking-widest uppercase">{comments.length} Responses</span>
           </div>
@@ -263,12 +252,12 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
               value="like"
               disabled={isButtonDisabled}
               className={cn(
-                "group flex items-center gap-3 px-5 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase transition-all duration-300",
+                "group flex items-center gap-3 px-5 py-2 rounded-sm text-[10px] font-bold tracking-widest uppercase transition-all duration-300 border",
                 isLoggedIn
-                  ? "bg-white/5 text-zinc-600 border border-white/10 cursor-not-allowed"
+                  ? "bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed"
                   : isActuallyLiked
-                    ? "bg-rose-500/10 text-rose-400 border border-rose-500/20 cursor-default"
-                    : "bg-white text-zinc-950 hover:bg-zinc-200 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+                    ? "bg-rose-50 text-rose-500 border-rose-200 cursor-default"
+                    : "bg-white text-black border-black hover:bg-gray-50 hover:scale-105 active:scale-95 shadow-sm"
               )}
             >
               <Heart
@@ -281,7 +270,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
               />
               <span>{isActuallyLiked ? "Liked" : "Like"}</span>
 
-              <div className={cn("w-[1px] h-3.5 transition-colors duration-300", isLoggedIn ? "bg-zinc-700" : isActuallyLiked ? "bg-rose-500/30" : "bg-zinc-300")} />
+              <div className={cn("w-[1px] h-3.5 transition-colors duration-300", isLoggedIn ? "bg-gray-300" : isActuallyLiked ? "bg-rose-200" : "bg-gray-300")} />
               <span className="font-mono text-[11px]">{likes}</span>
             </button>
           </Form>
@@ -312,7 +301,7 @@ export default function Baca({ loaderData }: Route.ComponentProps) {
               </AnimatePresence>
 
               {repliesMap[comment.id] && (
-                <div className="ml-6 md:ml-8 flex flex-col gap-6 border-l border-white/5 pl-6 md:pl-8">
+                <div className="ml-6 md:ml-8 flex flex-col gap-6 border-l border-gray-200 pl-6 md:pl-8">
                   {repliesMap[comment.id].map((reply: any) => (
                     <div key={reply.id} className="flex flex-col gap-6">
                       <CommentItem comment={reply} onReply={() => setReplyingTo(reply.id)} isAuthor={reply.name === adminUsername} isReply isReplying={replyingTo === reply.id} />
@@ -348,23 +337,23 @@ function CommentItem({ comment, onReply, isAuthor, isReply, isReplying }: any) {
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <span className={cn("text-sm md:text-base font-semibold tracking-tight", isAuthor ? "text-white" : "text-zinc-200")}>{comment.name}</span>
-            {isAuthor && <span className="text-[9px] md:text-[10px] bg-zinc-200 text-zinc-950 px-1.5 py-0.5 rounded-sm font-black uppercase tracking-tighter">Author</span>}
+            <span className={cn("text-sm md:text-base font-semibold tracking-tight", isAuthor ? "text-black" : "text-gray-800")}>{comment.name}</span>
+            {isAuthor && <span className="text-[9px] md:text-[10px] bg-black text-white px-1.5 py-0.5 rounded-sm font-black uppercase tracking-tighter">Author</span>}
           </div>
-          <span className="text-[10px] md:text-xs font-mono text-zinc-600 tracking-wider uppercase mt-0.5">{formatDate(comment.created_at, "DD/MM/YYYY — HH:mm")}</span>
+          <span className="text-[10px] md:text-xs font-mono text-gray-500 tracking-wider uppercase mt-0.5">{formatDate(comment.created_at, "DD/MM/YYYY — HH:mm")}</span>
         </div>
 
         {!isReplying && (
           <button
             onClick={onReply}
-            className="shrink-0 text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 mt-1"
+            className="shrink-0 text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors flex items-center gap-1.5 mt-1"
           >
             <ArrowUDownLeft weight="bold" /> Reply
           </button>
         )}
       </div>
 
-      <p className={cn("text-zinc-400 leading-relaxed max-w-[65ch]", isReply ? "text-sm" : "text-sm md:text-base")}>{comment.content}</p>
+      <p className={cn("text-gray-600 leading-relaxed max-w-[65ch]", isReply ? "text-sm" : "text-sm md:text-base")}>{comment.content}</p>
     </motion.div>
   );
 }
@@ -386,12 +375,12 @@ function CommentForm({ post_id, parent_id, visitorName, isLoggedIn, onCancel, au
     <Form
       ref={formRef}
       method="post"
-      className={cn("flex flex-col gap-4 p-5 rounded-2xl border transition-all", parent_id ? "bg-zinc-900/40 border-white/10 mt-2 shadow-lg" : "bg-white/[0.02] border-white/5")}
+      className={cn("flex flex-col gap-4 p-5 rounded-sm border transition-all", parent_id ? "bg-gray-50 border-gray-200 mt-2 shadow-sm" : "bg-white border-gray-200")}
     >
       <div className="flex items-center justify-between">
-        {title && <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{title}</h4>}
+        {title && <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">{title}</h4>}
         {onCancel && (
-          <button type="button" onClick={onCancel} className="text-zinc-500 hover:text-white transition-colors">
+          <button type="button" onClick={onCancel} className="text-gray-500 hover:text-black transition-colors">
             <X size={14} weight="bold" />
           </button>
         )}
@@ -400,14 +389,14 @@ function CommentForm({ post_id, parent_id, visitorName, isLoggedIn, onCancel, au
       <input type="hidden" name="post_id" value={post_id} />
       {parent_id && <input type="hidden" name="parent_id" value={parent_id} />}
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 font-sans">
         {showNameInput && (
           <input
             type="text"
             name="name"
             placeholder="Name..."
             required
-            className="bg-zinc-900/50 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-zinc-700"
+            className="bg-white border border-gray-200 rounded-sm px-4 py-2.5 text-xs text-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-gray-400"
           />
         )}
 
@@ -417,7 +406,7 @@ function CommentForm({ post_id, parent_id, visitorName, isLoggedIn, onCancel, au
           required
           rows={2}
           autoFocus={autoFocus}
-          className="bg-zinc-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/20 transition-all resize-none placeholder:text-zinc-700"
+          className="bg-white border border-gray-200 rounded-sm px-4 py-3 text-sm text-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all resize-none placeholder:text-gray-400"
         />
       </div>
 
@@ -427,13 +416,13 @@ function CommentForm({ post_id, parent_id, visitorName, isLoggedIn, onCancel, au
           name="intent"
           value="comment"
           disabled={isSubmitting}
-          className="bg-white text-zinc-950 px-6 py-2 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+          className="bg-black text-white px-6 py-2 rounded-sm text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-gray-800 transition-all disabled:opacity-50"
         >
           {isSubmitting ? (
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-              className="w-3 h-3 border-2 border-zinc-950 border-t-transparent rounded-full"
+              className="w-3 h-3 border-2 border-white border-t-transparent rounded-full"
             />
           ) : (
             <PaperPlaneTilt weight="bold" size={12} />

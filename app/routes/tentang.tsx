@@ -50,11 +50,11 @@ export default function Tentang({ loaderData }: Route.ComponentProps) {
   const { page, isLoggedIn } = loaderData;
 
   return (
-    <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-medium tracking-tighter text-white">{page?.title || "Tentang Saya"}</h1>
+    <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700 mt-10">
+      <div className="flex justify-between items-center border-b border-gray-200 pb-4">
+        <h1 className="text-4xl font-semibold tracking-tight text-black">{page?.title || "About"}</h1>
         {isLoggedIn && (
-          <Link to="/edit-page/about" className="p-2 bg-white/5 border border-white/10 rounded-full text-gray-400 hover:text-white transition-colors">
+          <Link to="/edit-page/about" className="p-2 bg-white border border-gray-200 rounded-sm text-gray-500 hover:text-black transition-colors hover:bg-gray-50">
             <PencilSimple size={20} />
           </Link>
         )}
@@ -62,12 +62,12 @@ export default function Tentang({ loaderData }: Route.ComponentProps) {
 
       {page?.content ? (
         <div
-          className="prose prose-invert prose-neutral text-gray-400 leading-relaxed max-w-none 
-          prose-headings:text-white prose-a:text-white prose-strong:text-white"
+          className="prose prose-neutral text-gray-800 leading-relaxed max-w-none font-sans 
+          prose-headings:text-black prose-a:text-black prose-strong:text-black"
           dangerouslySetInnerHTML={{ __html: page.content }}
         />
       ) : (
-        <p className="text-gray-500 italic">Belum ada konten untuk halaman ini.</p>
+        <p className="text-gray-500 italic">No content available for this page yet.</p>
       )}
     </div>
   );

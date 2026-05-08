@@ -33,15 +33,15 @@ export function Header({
   ];
 
   return (
-    <header className="py-6 flex items-center justify-between sticky top-0 z-50 bg-oled/80 backdrop-blur-md gap-1">
-      <Link to="/" className="text-white font-medium tracking-tight text-sm md:text-xl shrink-0">
+    <header className="py-6 flex items-center justify-between sticky top-0 z-50 bg-white/90 backdrop-blur-md gap-1">
+      <Link to="/" className="text-black font-semibold tracking-tight text-sm md:text-xl shrink-0">
         <span className="hidden sm:inline">Andika Dinata</span>
         <span className="sm:hidden">AD</span>
-        <span className="text-gray-500">.</span>
+        <span className="text-gray-400">.</span>
       </Link>
 
       <div className="flex items-center gap-1 md:gap-3">
-        <nav className="flex items-center gap-0.5 md:gap-1 bg-white/5 border border-white/10 rounded-full p-1 backdrop-blur-xl">
+        <nav className="flex items-center gap-0.5 md:gap-1 border border-gray-200 rounded-full p-1 bg-white">
           {PUBLIC_NAV.map((item) => {
             const isActive = location.pathname === item.path || (item.path !== "/" && location.pathname.startsWith(`${item.path}/`));
             const NavIcon = item.icon;
@@ -52,13 +52,13 @@ export function Header({
                 to={item.path}
                 className={cn(
                   "relative px-2 md:px-4 py-2 text-xs md:text-sm transition-colors rounded-full flex items-center gap-2 z-10 font-medium",
-                  isActive ? "text-oled" : "text-gray-400 hover:text-white"
+                  isActive ? "text-white" : "text-gray-500 hover:text-black"
                 )}
               >
                 {isActive && (
                   <motion.div
                     layoutId="active-nav-indicator"
-                    className="absolute inset-0 bg-accent rounded-full -z-10"
+                    className="absolute inset-0 bg-black rounded-full -z-10"
                     transition={{ type: "spring", stiffness: 120, damping: 20 }}
                   />
                 )}
@@ -72,7 +72,7 @@ export function Header({
             <button
               type="button"
               onClick={() => setShowAdmin(!showAdmin)}
-              className={cn("md:hidden p-2 rounded-full transition-colors relative", showAdmin ? "text-white bg-white/10" : "text-gray-500")}
+              className={cn("md:hidden p-2 rounded-full transition-colors relative", showAdmin ? "text-black bg-gray-100" : "text-gray-500")}
             >
               <Plus className={cn("w-4 h-4 transition-transform", showAdmin && "rotate-45")} />
               {adminUnreadCount > 0 && !showAdmin && (
@@ -84,22 +84,22 @@ export function Header({
 
         {!isLoggedIn && (
           <div className="flex items-center gap-1 md:gap-3">
-            <Link to="/notifikasi" className="p-2 md:p-2.5 text-gray-400 hover:text-white bg-white/5 border border-white/10 rounded-full transition-colors relative" title="Notifikasi Anda">
+            <Link to="/notifikasi" className="p-2 md:p-2.5 text-gray-500 hover:text-black border border-gray-200 rounded-full transition-colors relative bg-white" title="Notifikasi Anda">
               <Bell className="w-4 h-4" />
               {visitorUnreadCount > 0 && (
-                <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white">
                   {visitorUnreadCount > 9 ? "9+" : visitorUnreadCount}
                 </span>
               )}
             </Link>
-            <Link to="/login" className="p-2 md:p-2.5 text-gray-400 hover:text-white bg-white/5 border border-white/10 rounded-full transition-colors" title="Sign In">
+            <Link to="/login" className="p-2 md:p-2.5 text-gray-500 hover:text-black border border-gray-200 rounded-full transition-colors bg-white" title="Sign In">
               <SignIn weight="bold" className="w-4 h-4" />
             </Link>
           </div>
         )}
 
         {isLoggedIn && (
-          <div className="hidden md:flex items-center gap-1 bg-white/5 border border-white/10 rounded-full p-1">
+          <div className="hidden md:flex items-center gap-1 bg-white border border-gray-200 rounded-full p-1">
             {ADMIN_NAV.map((item) => {
               const AdminIcon = item.icon;
               const hasNotification = item.path === "/notifikasi" && adminUnreadCount > 0;
@@ -107,11 +107,11 @@ export function Header({
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={cn("p-2 rounded-full transition-colors relative", location.pathname === item.path ? "text-white bg-white/10" : "text-gray-500 hover:text-white")}
+                  className={cn("p-2 rounded-full transition-colors relative", location.pathname === item.path ? "text-black bg-gray-100" : "text-gray-500 hover:text-black")}
                 >
                   <AdminIcon className="w-5 h-5" />
                   {hasNotification && (
-                    <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white">
                       {adminUnreadCount > 9 ? "9+" : adminUnreadCount}
                     </span>
                   )}
@@ -123,7 +123,7 @@ export function Header({
 
         {isLoggedIn && (
           <Form method="post" action="/logout" className="shrink-0">
-            <button type="submit" className="p-2 md:p-2.5 text-gray-400 hover:text-red-400 bg-white/5 border border-white/10 rounded-full transition-colors">
+            <button type="submit" className="p-2 md:p-2.5 text-gray-500 hover:text-white hover:bg-black bg-white border border-gray-200 rounded-full transition-colors">
               <SignOut weight="bold" className="w-4 h-4" />
             </button>
           </Form>
@@ -133,7 +133,7 @@ export function Header({
       <AnimatePresence>
         {isLoggedIn && showAdmin && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute top-20 right-5 left-5 z-[60] md:hidden">
-            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-2 flex flex-col gap-1 shadow-2xl">
+            <div className="bg-white border border-gray-200 rounded-2xl p-2 flex flex-col gap-1 shadow-xl">
               {ADMIN_NAV.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -141,7 +141,7 @@ export function Header({
                     key={item.path}
                     to={item.path}
                     onClick={() => setShowAdmin(false)}
-                    className="flex items-center gap-3 p-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                    className="flex items-center gap-3 p-3 text-gray-600 hover:text-black hover:bg-gray-50 rounded-xl transition-colors"
                   >
                     <Icon size={20} />
                     <span className="font-medium text-sm">{item.label}</span>
