@@ -9,7 +9,7 @@ import { siteConfig } from "../config";
 import { cn } from "../utils/cn";
 import { formatDate } from "../utils/date";
 import { getPostBySlug, getPostNavigation, deletePost } from "../services/post.server";
-import { getCommentsAndLikes, addLike, addComment, deleteComment } from "../services/comment.server";
+import { getCommentsAndLikes, addLike, addComment } from "../services/comment.server";
 
 export function meta({ data }: Route.MetaArgs) {
   if (!data?.post) return [{ title: "Not Found" }];
